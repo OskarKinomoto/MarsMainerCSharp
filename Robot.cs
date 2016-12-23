@@ -125,8 +125,36 @@ namespace MarsMiner
 			return state == State.Breaking;
 		}
 
+		public bool IsMoving()
+		{
+			return m_velocity.LengthSquared != 0;
+		}
+
+		public bool IsMovingVerticaly()
+		{
+			return m_velocity.X != 0;
+		}
+
+		public bool IsMovingHorizontaly()
+		{
+			return m_velocity.Y != 0;
+		}
+
+		private void StopMoving() 
+		{
+			m_velocity = new Vector2();
+		}
+
+		private void RecieveMineral()
+		{
+			if (MineralToRecieve != null)
+				cargo.Add(MineralToRecieve);
+			
+			MineralToRecieve = null;
+		}
+
 		// TICKS
-		public void Tick(float tau, Vector3[] collisionTiles, Breaking user, out Breaking b)
+		public void Tick(float tau, CollisionTile[] collisionTiles, Breaking user, out Breaking b)
 		{
 			b = Breaking.None;
 
@@ -158,20 +186,17 @@ namespace MarsMiner
 
 			if (dist <= move) {
 				m_position = new Vector2(tileX, tileY);
-				state = State.UserControled;
 				breakingTile = new Vector3(0, 0, 0);
 
-				if (MineralToRecieve != null) {
-					cargo.Add(MineralToRecieve);
-					MineralToRecieve = null;
-				}
+				RecieveMineral();
+				SetStateToUser();
 
 			} else {
 				m_position += d * move / dist;
 			}
 		}
 
-		private void TickUser(float tau, Vector3[] collisionTiles, out Breaking isBreaking, Breaking userMovement)
+		private void TickUser(float tau, CollisionTile[] collisionTiles, out Breaking isBreaking, Breaking userMovement)
 		{
 			isBreaking = Breaking.None;
 
@@ -220,56 +245,54 @@ namespace MarsMiner
 			float VelocityBeforeCollisions = m_velocity.Length;
 
 			// Sort collision tiles so foreach magick algorithm will work as intended
-			Array.Sort(collisionTiles, (Vector3 x, Vector3 y) => x.Z == y.Z ? 0 : (x.Z > y.Z ? 1 : -1));
+			Array.Sort(collisionTiles);
 
 			// Magick algoithm – collisions and tile breaking
 			// TODO carefully refactor!! git etc to not break THE MAGICK!!
-			foreach (Vector3 tile in collisionTiles) {
-				// Test if bottom tile
-				if (Math.Floor(tile.Z) == 0) {
-					var down = tile.Y * Tile.Size;
-					if (m_position.Y <= down + 1) {
-
-						if (possibleBreaking.Down && userMovement == Breaking.Down && tile.Z == 0) {
+			foreach (CollisionTile tile in collisionTiles) {
+				
+				if (tile.position == CollisionTile.Position.Bottom) {
+					if (m_position.Y <= tile.bottom) {
+						if (possibleBreaking.Down && userMovement == Breaking.Down && tile.breakable) {
 							if (isBreaking == Breaking.None && m_velocity.Y != 0) {
 								isBreaking = Breaking.Down;
 								possibleBreaking.Down = false;
 							}
 						} else {
 							possibleBreaking.All = true;
-							m_position.Y = down + 1;
+							m_position.Y = tile.bottom;
 							m_velocity.Y = 0;
 						}
 					}
 				}
 
-				if (Math.Floor(tile.Z) == 1) { // left
-					var left = (tile.X + 1) * Tile.Size;
-					if (m_position.X <= left + 1) {
-						if (possibleBreaking.LeftRight && userMovement == Breaking.Left && tile.Z == 1) {
+				if (tile.position == CollisionTile.Position.Left) { 
+					var left = tile.left;
+					if (m_position.X <= left) {
+						if (possibleBreaking.LeftRight && userMovement == Breaking.Left && tile.breakable) {
 							isBreaking = Breaking.Left;
 						} else {
-							m_position.X = left + 1;
+							m_position.X = left;
 							m_velocity.X = 0;
 						}
 					}
 				}
 
-				if (Math.Floor(tile.Z) == 2) { // up
-					var top = (tile.Y - 1) * Tile.Size - Size;
-					if (m_position.Y >= top - 1) {
-						m_position.Y = top - 1;
+				if (tile.position == CollisionTile.Position.Top) { 
+					var top = tile.top;
+					if (m_position.Y >= top) {
+						m_position.Y = top;
 						m_velocity.Y = 0;
 					}
 				}
 
-				if (Math.Floor(tile.Z) == 3) { // right
-					var right = (tile.X) * Tile.Size - Size;
-					if (m_position.X >= right - 1) {
-						if (possibleBreaking.LeftRight && userMovement == Breaking.Right && tile.Z == 3) {
+				if (tile.position == CollisionTile.Position.Right) { 
+					var right = tile.right;
+					if (m_position.X >= right) {
+						if (possibleBreaking.LeftRight && userMovement == Breaking.Right && tile.breakable) {
 							isBreaking = Breaking.Right;
 						} else {
-							m_position.X = right - 1;
+							m_position.X = right;
 							m_velocity.X = 0;
 						}
 					}
@@ -278,7 +301,7 @@ namespace MarsMiner
 
 			if (isBreaking != Breaking.None) {
 				state = State.Breaking;
-				m_velocity = new Vector2();
+				StopMoving();
 			}
 
 			if (wasMovingAtBeginOfTick)
