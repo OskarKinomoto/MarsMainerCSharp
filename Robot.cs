@@ -28,6 +28,27 @@ namespace MarsMiner
 			public bool LeftRight = false;
 			public bool Down = false;
 
+			public Breaking breaking = Breaking.None;
+
+			public bool IsDown {
+				get {
+					return breaking == Breaking.Down && Down;
+				}
+			}
+
+			public bool IsLeft {
+				get {
+					return breaking == Breaking.Left && LeftRight;
+				}
+			}
+
+
+			public bool IsRight {
+				get {
+					return breaking == Breaking.Right && LeftRight;
+				}
+			}
+
 			public bool All { set { LeftRight = Down = value; } }
 		}
 
@@ -115,6 +136,12 @@ namespace MarsMiner
 			state = State.UserControled;
 		}
 
+		public void SetStateToBreaking()
+		{
+			state = State.Breaking;
+			StopMoving();
+		}
+
 		public void SetMineralToRecieve(Mineral m)
 		{
 			MineralToRecieve = m;
@@ -140,7 +167,7 @@ namespace MarsMiner
 			return m_velocity.Y != 0;
 		}
 
-		private void StopMoving() 
+		private void StopMoving()
 		{
 			m_velocity = new Vector2();
 		}
@@ -151,6 +178,11 @@ namespace MarsMiner
 				cargo.Add(MineralToRecieve);
 			
 			MineralToRecieve = null;
+		}
+
+		private void SetHorizontalPosition(float X) {
+			m_position.X = X;
+			m_velocity.X = 0;
 		}
 
 		// TICKS
@@ -176,16 +208,15 @@ namespace MarsMiner
 		{
 			fuel.Use(drill.FuelUsage() * tau);
 
-			var tileX = breakingTile.X * Tile.Size + (Tile.Size - Size) / 2;
-			var tileY = (breakingTile.Y - 1) * Tile.Size;
+			var tile = new Vector2 (breakingTile.X * Tile.Size + (Tile.Size - Size) / 2, (breakingTile.Y - 1) * Tile.Size);
 
-			var d = new Vector2(tileX - m_position.X, tileY - m_position.Y);
+			var d = tile - m_position;
 			var dist = d.Length;
 
 			var move = drill.DrillingSpeed() * tau;
 
 			if (dist <= move) {
-				m_position = new Vector2(tileX, tileY);
+				m_position = tile;
 				breakingTile = new Vector3(0, 0, 0);
 
 				RecieveMineral();
@@ -199,6 +230,8 @@ namespace MarsMiner
 		private void TickUser(float tau, CollisionTile[] collisionTiles, out Breaking isBreaking, Breaking userMovement)
 		{
 			isBreaking = Breaking.None;
+
+			possibleBreaking.breaking = userMovement;
 
 			switch (userMovement) {
 			case Breaking.Left:
@@ -232,15 +265,11 @@ namespace MarsMiner
 			m_position += m_velocity * tau;
             
 			// Stop at map endings
-			if (m_position.X < Model.MinTileX) {
-				m_position.X = Model.MinTileX;
-				m_velocity.X = 0;
-			}
+			if (m_position.X < Model.MinTileX)
+				SetHorizontalPosition(Model.MinTileX);
 
-			if (m_position.X + Robot.Size > Model.MaxTileX) {
-				m_position.X = Model.MaxTileX - Robot.Size;
-				m_velocity.X = 0;
-			}
+			if (m_position.X + Robot.Size > Model.MaxTileX)
+				SetHorizontalPosition(Model.MaxTileX - Robot.Size);
 
 			float VelocityBeforeCollisions = m_velocity.Length;
 
@@ -250,59 +279,46 @@ namespace MarsMiner
 			// Magick algoithm – collisions and tile breaking
 			// TODO carefully refactor!! git etc to not break THE MAGICK!!
 			foreach (CollisionTile tile in collisionTiles) {
+				if (!tile.Colide(m_position))
+					continue;
 				
 				if (tile.position == CollisionTile.Position.Bottom) {
-					if (m_position.Y <= tile.bottom) {
-						if (possibleBreaking.Down && userMovement == Breaking.Down && tile.breakable) {
-							if (isBreaking == Breaking.None && m_velocity.Y != 0) {
-								isBreaking = Breaking.Down;
-								possibleBreaking.Down = false;
-							}
-						} else {
-							possibleBreaking.All = true;
-							m_position.Y = tile.bottom;
-							m_velocity.Y = 0;
+					if (possibleBreaking.IsDown && tile.breakable) {
+						if (isBreaking == Breaking.None && m_velocity.Y != 0) {
+							isBreaking = Breaking.Down;
+							possibleBreaking.Down = false;
 						}
-					}
-				}
-
-				if (tile.position == CollisionTile.Position.Left) { 
-					var left = tile.left;
-					if (m_position.X <= left) {
-						if (possibleBreaking.LeftRight && userMovement == Breaking.Left && tile.breakable) {
-							isBreaking = Breaking.Left;
-						} else {
-							m_position.X = left;
-							m_velocity.X = 0;
-						}
-					}
-				}
-
-				if (tile.position == CollisionTile.Position.Top) { 
-					var top = tile.top;
-					if (m_position.Y >= top) {
-						m_position.Y = top;
+					} else {
+						possibleBreaking.All = true;
+						m_position.Y = tile.bottom;
 						m_velocity.Y = 0;
 					}
 				}
 
+				if (tile.position == CollisionTile.Position.Left) { 
+					if (possibleBreaking.IsLeft && tile.breakable) {
+						isBreaking = Breaking.Left;
+					} else {
+						SetHorizontalPosition(tile.left);
+					}
+				}
+
+				if (tile.position == CollisionTile.Position.Top) {
+					m_position.Y = tile.top;
+					m_velocity.Y = 0;
+				}
+
 				if (tile.position == CollisionTile.Position.Right) { 
-					var right = tile.right;
-					if (m_position.X >= right) {
-						if (possibleBreaking.LeftRight && userMovement == Breaking.Right && tile.breakable) {
-							isBreaking = Breaking.Right;
-						} else {
-							m_position.X = right;
-							m_velocity.X = 0;
-						}
+					if (possibleBreaking.IsRight && tile.breakable) {
+						isBreaking = Breaking.Right;
+					} else {
+						SetHorizontalPosition(tile.right);
 					}
 				}
 			}
 
-			if (isBreaking != Breaking.None) {
-				state = State.Breaking;
-				StopMoving();
-			}
+			if (isBreaking != Breaking.None)
+				SetStateToBreaking();
 
 			if (wasMovingAtBeginOfTick)
 				hull.LooseByVelocityChange(VelocityBeforeCollisions, m_velocity.Length);

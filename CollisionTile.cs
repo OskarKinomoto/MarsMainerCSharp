@@ -1,4 +1,5 @@
 ﻿using System;
+using OpenTK;
 
 namespace MarsMiner
 {
@@ -49,6 +50,22 @@ namespace MarsMiner
 			get {
 				return tile.PosY * Tile.Size + 1;
 			}
+		}
+
+		public bool Colide(Vector2 robot)
+		{
+			switch (position) {
+			case Position.Bottom:
+				return robot.Y <= bottom;
+			case Position.Left:
+				return robot.X <= left;
+			case Position.Top:
+				return robot.Y >= top;
+			case Position.Right:
+				return robot.X >= right;
+			}
+
+			throw new Exception();
 		}
 
 		public int CompareTo(CollisionTile other)
