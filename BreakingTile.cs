@@ -2,11 +2,16 @@
 
 namespace MarsMiner
 {
-	public class BreakingTile
+	class BreakingTile
 	{
-		public BreakingTile()
+		public Tile tile;
+		public bool destroyed = false;
+
+		public BreakingTile(Tile tile)
 		{
+			this.tile = tile;
 		}
+		
 	}
 }
 

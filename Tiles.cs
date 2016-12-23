@@ -125,11 +125,11 @@ namespace MarsMiner
 
 		public CollisionTile[] CollisionTiles(Vector2[] robotOnTiles)
 		{
-			List<CollisionTile> ret = new List<CollisionTile>();
+			List<CollisionTile> CollisionTilesList = new List<CollisionTile>();
 
 			Action<int, int, CollisionTile.Position> Add = (int xx, int yy, CollisionTile.Position pos) => {
 				if (CheckTileCords(xx, yy) && tiles[xx, yy].collision)
-					ret.Add(new CollisionTile(tiles[xx, yy], pos));
+					CollisionTilesList.Add(new CollisionTile(tiles[xx, yy], pos));
 			};
 
 			foreach (Vector2 tile in robotOnTiles) {
@@ -149,8 +149,9 @@ namespace MarsMiner
 				Add(xx, yy - 1, CollisionTile.Position.Top);
 			}
 
-			return ret.ToArray();
-
+			var CollisionTilesArray = CollisionTilesList.ToArray();
+			Array.Sort(CollisionTilesArray);
+			return CollisionTilesArray;
 		}
 	}
 }

@@ -185,6 +185,11 @@ namespace MarsMiner
 			m_velocity.X = 0;
 		}
 
+		private void SetVerticalPosition(float Y) {
+			m_position.Y = Y;
+			m_velocity.Y = 0;
+		}
+
 		// TICKS
 		public void Tick(float tau, CollisionTile[] collisionTiles, Breaking user, out Breaking b)
 		{
@@ -233,6 +238,8 @@ namespace MarsMiner
 
 			possibleBreaking.breaking = userMovement;
 
+			bool wasMovingAtBeginOfTick = m_velocity.LengthSquared > 0;
+
 			switch (userMovement) {
 			case Breaking.Left:
 				sprite = Sprites.Name.RobotLeft;
@@ -243,11 +250,8 @@ namespace MarsMiner
 			}
 
 			// User move
-			if (userMovement != Breaking.None) {
+			if (userMovement != Breaking.None)
 				fuel.Use((float)(engine.FuelUse() * tau));
-			}
-
-			bool wasMovingAtBeginOfTick = m_velocity.LengthSquared > 0;
 
 			// forces -> velocity
 			m_velocity += forces * tau / mass;
@@ -271,18 +275,17 @@ namespace MarsMiner
 			if (m_position.X + Robot.Size > Model.MaxTileX)
 				SetHorizontalPosition(Model.MaxTileX - Robot.Size);
 
-			float VelocityBeforeCollisions = m_velocity.Length;
-
-			// Sort collision tiles so foreach magick algorithm will work as intended
-			Array.Sort(collisionTiles);
+			var VelocityBeforeCollisions = wasMovingAtBeginOfTick ? m_velocity.Length : 0;
 
 			// Magick algoithm – collisions and tile breaking
 			// TODO carefully refactor!! git etc to not break THE MAGICK!!
 			foreach (CollisionTile tile in collisionTiles) {
 				if (!tile.Colide(m_position))
 					continue;
-				
-				if (tile.position == CollisionTile.Position.Bottom) {
+
+				switch (tile.position) {
+
+				case CollisionTile.Position.Bottom:
 					if (possibleBreaking.IsDown && tile.breakable) {
 						if (isBreaking == Breaking.None && m_velocity.Y != 0) {
 							isBreaking = Breaking.Down;
@@ -290,40 +293,38 @@ namespace MarsMiner
 						}
 					} else {
 						possibleBreaking.All = true;
-						m_position.Y = tile.bottom;
-						m_velocity.Y = 0;
+						SetVerticalPosition(tile.bottom);
 					}
-				}
+					break;
 
-				if (tile.position == CollisionTile.Position.Left) { 
-					if (possibleBreaking.IsLeft && tile.breakable) {
+				case CollisionTile.Position.Left:
+					if (possibleBreaking.IsLeft && tile.breakable)
 						isBreaking = Breaking.Left;
-					} else {
+					else
 						SetHorizontalPosition(tile.left);
-					}
-				}
+					break;
 
-				if (tile.position == CollisionTile.Position.Top) {
-					m_position.Y = tile.top;
-					m_velocity.Y = 0;
-				}
+				case CollisionTile.Position.Top:
+					SetVerticalPosition(tile.top);
+					break;
 
-				if (tile.position == CollisionTile.Position.Right) { 
-					if (possibleBreaking.IsRight && tile.breakable) {
+				case CollisionTile.Position.Right:
+					if (possibleBreaking.IsRight && tile.breakable)
 						isBreaking = Breaking.Right;
-					} else {
+					else
 						SetHorizontalPosition(tile.right);
-					}
+					break;
 				}
 			}
 
 			if (isBreaking != Breaking.None)
 				SetStateToBreaking();
 
-			if (wasMovingAtBeginOfTick)
-				hull.LooseByVelocityChange(VelocityBeforeCollisions, m_velocity.Length);
+			if (wasMovingAtBeginOfTick) {
+				var VelocityAfterCollisions = m_velocity.Length;
+				hull.LooseByVelocityChange(VelocityBeforeCollisions, VelocityAfterCollisions);
+			}
 		}
-
 		// END TICKS
 
 		// Geometry

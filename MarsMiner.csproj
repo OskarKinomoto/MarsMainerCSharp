@@ -106,6 +106,7 @@
     <Compile Include="Engine.cs" />
     <Compile Include="MainSystem.cs" />
     <Compile Include="CollisionTile.cs" />
+    <Compile Include="BreakingTile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

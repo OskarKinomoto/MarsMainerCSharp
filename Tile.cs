@@ -53,10 +53,10 @@ namespace MarsMiner
 			}
 		}
 
-		public void setCollision(ref Vector3 bt)
+		public void setCollision(ref Vector3 breakingTile)
 		{
 			_collision = false;
-			bt = new Vector3(PosX, PosY, 1);
+			breakingTile = new Vector3(PosX, PosY, 1);
 		}
 
 		public void destroy()
