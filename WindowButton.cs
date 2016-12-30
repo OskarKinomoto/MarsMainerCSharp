@@ -1,47 +1,31 @@
 ﻿using System;
 using OpenTK;
 using System.Diagnostics;
+using System.Drawing;
 
 namespace MarsMiner
 {
-	public class WindowButton : PaintInterface, MouseInterface
+	public class WindowButton : WindowObjectBase, MouseInterface
 	{
-		public enum Position {
-			Left,
-			Center,
-			Right,
-		}
-
 		public enum Type {
 			Normal,
 			Close,
 		}
 
-		private Position position;
-
 		private Type type;
 
 		public event Action onClickEvent;
-
-		private Window parent;
 
 		private Vector2 size = new Vector2(20,20);
 		private float margin = 5;
 
 		private Textures text;
 
-		private int WindowX;
-		private int WindowY;
 		private bool focus = false;
 
-		private Layer layer;
-
-		public WindowButton(int windowX, int windowY, Type type, Window parent, Position position, Layer layer, string s = "")
+		public WindowButton(Point position, Type type, Window parent, Align align, Layer layer, string s = "")
+			: base(parent, layer, position, align)
 		{
-			this.layer = layer;
-			this.WindowX = windowX;
-			this.WindowY = windowY;
-			this.position = position;
 			this.type = type;
 			this.parent = parent;
 
@@ -56,7 +40,6 @@ namespace MarsMiner
 			size.X = 20 + width;
 		}
 
-
 		public void setOnClickEvent(Action onClickEvent)
 		{
 			this.onClickEvent = onClickEvent;
@@ -64,16 +47,16 @@ namespace MarsMiner
 
 		private Vector2 windowPosition() 
 		{
-			Vector2 ret = new Vector2(0, WindowY + size.Y + margin);
+			Vector2 ret = new Vector2(0, position.Y + size.Y + margin);
 
-			switch (position) {
-			case Position.Right:
-				ret.X = parent.Width - WindowX - size.X - margin;
+			switch (align) {
+			case Align.Right:
+				ret.X = parent.Width - position.X - size.X - margin;
 				break;
-			case Position.Left:
-				ret.X = WindowX + margin;
+			case Align.Left:
+				ret.X = position.X + margin;
 				break;
-			case Position.Center:
+			case Align.Center:
 				ret.X = (parent.Width - size.X) / 2;
 				break;
 			}
@@ -81,12 +64,12 @@ namespace MarsMiner
 			return ret;
 		}
 
-		public void Paint()
+		public override void Paint()
 		{
-			throw new MissingMethodException();
+			throw new Exception();
 		}
 
-		public void PaintOnScreen()
+		public override void PaintOnScreen()
 		{
 			Sprites.Bind();
 			Painter.EnableTextures();
@@ -95,7 +78,7 @@ namespace MarsMiner
 			var glPosition = parent.windowToRealPos(windowPosition());
 
 			if (type == Type.Close) {
-				Painter.Sprite(glPosition, size, focus ? Sprites.Name.CloseCircleFocus : Sprites.Name.CloseCircle, layer);
+				Painter.Sprite(glPosition, size, focus ? Sprites.Name.CloseCircleFocus : Sprites.Name.CloseCircle, layer + 0.5f);
 				Painter.Stop();
 			} else {
 				Painter.Sprite(glPosition + new Vector2(size.Y, size.Y), size - new Vector2(size.Y, size.Y) * 2, focus ? Sprites.Name.ButtonFocusCenter : Sprites.Name.ButtonCenter, layer);

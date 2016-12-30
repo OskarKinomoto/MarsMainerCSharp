@@ -1,4 +1,5 @@
 ﻿using System;
+using OpenTK;
 
 namespace MarsMiner
 {
@@ -11,9 +12,14 @@ namespace MarsMiner
 
 		private Model model = Model.Standard;
 
+		public bool running = false;
+		public float angle = 0;
 
-		public static float UpSpeed(Model m)
+		public static float UpForce(Model m)
 		{
+			if (Preferences.GodMode)
+				return 500;
+			
 			switch (m) {
 			case Model.Standard:
 			default:
@@ -21,12 +27,15 @@ namespace MarsMiner
 			}
 		}
 
-		public float UpSpeed() {
-			return UpSpeed(model);
+		public float UpForce() {
+			return UpForce(model);
 		}
 
-		public static float DownSpeed(Model m)
+		public static float DownForce(Model m)
 		{
+			if (Preferences.GodMode)
+				return 500;
+			
 			switch (m) {
 			case Model.Standard:
 			default:
@@ -34,12 +43,15 @@ namespace MarsMiner
 			}
 		}
 
-		public float DownSpeed() {
-			return DownSpeed(model);
+		public float DownForce() {
+			return DownForce(model);
 		}
 
-		public static float HorizontalSpeed(Model m)
+		public static float HorizontalForce(Model m)
 		{
+			if (Preferences.GodMode)
+				return 500;
+			
 			switch (m) {
 			case Model.Standard:
 			default:
@@ -47,12 +59,12 @@ namespace MarsMiner
 			}
 		}
 
-		public float HorizontalSpeed() {
-			return HorizontalSpeed(model);
+		public float HorizontalForce() {
+			return HorizontalForce(model);
 		}
 
 		public static float FuelUse(Model m)
-		{
+		{			
 			switch (m) {
 			case Model.Standard:
 			default:
@@ -62,6 +74,39 @@ namespace MarsMiner
 
 		public float FuelUse() {
 			return FuelUse(model);
+		}
+
+		public Vector2 Force() {
+			Vector2 force = new Vector2(0, 0);
+
+			if (running) {
+				force.X = (float)Math.Cos(angle) * HorizontalForce();
+
+				var y = (float)Math.Sin(angle);
+				if (y > 0)
+					force.Y = y * UpForce(); 
+				else if(y < 0)
+					force.Y = y * DownForce(); 
+			}
+			return force;
+		}
+
+		const float AngleMargin = (float)Math.PI / 12f;
+
+		public Robot.Breaking Breaking() {
+			if (-angle > -AngleMargin + Math.PI / 2 && -angle < AngleMargin + Math.PI / 2)
+				return Robot.Breaking.Down;
+
+			if (angle > -AngleMargin + Math.PI / 2 && angle < AngleMargin + Math.PI / 2)
+				return Robot.Breaking.Up;
+
+			if (angle < AngleMargin && angle > -AngleMargin)
+				return Robot.Breaking.Right;
+
+			if (angle < AngleMargin + Math.PI && angle > -AngleMargin + Math.PI)
+				return Robot.Breaking.Left;
+
+			return Robot.Breaking.None;
 		}
 	}
 }

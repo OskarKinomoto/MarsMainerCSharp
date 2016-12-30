@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace MarsMiner
 {
@@ -17,35 +18,26 @@ namespace MarsMiner
 			Rubin = 4,
 			Copper = 5,
 			Saphire = 6,
+			Salt = 7,
+			Emerald = 8,
 		}
+
+		private readonly int[] Prices = new int[]{ 100, 50, 20, 250, 65, 5, 125, 3, 35 };
+			
+		private readonly Sprites.Name sprite;
+		private readonly int price;
 
 		private Type type = Type.Gold;
 
-		private Mineral(Type type)
+		private Mineral(Type type, Sprites.Name sprite)
 		{
 			this.type = type;
+			this.sprite = sprite;
 		}
 
 		public Sprites.Name GetSprite()
 		{
-			switch (type) {
-			case Type.Gold:
-				return Sprites.Name.TileGold;	
-			case Type.Lapis:
-				return Sprites.Name.TileLapis;	
-			case Type.Silver:
-				return Sprites.Name.TileSilver;	
-			case Type.Copper:
-				return Sprites.Name.TileCopper;
-			case Type.Platinium:
-				return Sprites.Name.TilePlatinium;
-			case Type.Rubin: 
-				return Sprites.Name.TileRubin;
-			case Type.Saphire: 
-				return Sprites.Name.TileSaphire;
-			}
-
-			return Sprites.Name.TileGold;
+			return sprite;
 		}
 
 		private static float gauss(float x, float avg, float sigma)
@@ -63,7 +55,9 @@ namespace MarsMiner
 		}
 
 		private static bool savedToFile = false;
-		private static void SaveToFile() {
+
+		private static void SaveToFile()
+		{
 			if (savedToFile)
 				return;
 			savedToFile = true;
@@ -73,8 +67,7 @@ namespace MarsMiner
 
 			System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
 
-			using(StreamWriter writetext = new StreamWriter("propabilities.txt"))
-			{
+			using (StreamWriter writetext = new StreamWriter("propabilities.txt")) {
 				for (int depth = 0; depth < 400; ++depth) {
 					var prob = CalcPropabilitesOnDepth(-depth);
 
@@ -94,27 +87,40 @@ namespace MarsMiner
 
 			List<float> ret = new List<float>();
 
-			// Gold
-			ret.Add(limitedGauss(TileDepth, 50, 100, 10, -1, 1));
 
-			// Lapis
-			ret.Add(limitedGauss(TileDepth, 30, 10, 0, -1, .2f));
+			if (Preferences.MineralsDeveloper) {
+				int max = (int)Enum.GetValues(typeof(Type)).Cast<Type>().Last();
+				for (int i = 0; i < max; ++i) {
+					ret.Add(1);
+				}
+			} else {
+				// Gold
+				ret.Add(limitedGauss(TileDepth, 50, 100, 10, -1, 1));
 
-			// Silver
-			ret.Add(limitedGauss(TileDepth, 30, 100, 0, -1, 1.1f) + .002f);
+				// Lapis
+				ret.Add(limitedGauss(TileDepth, 30, 10, 0, -1, .2f));
 
-			// Platinium
-			ret.Add(limitedGauss(TileDepth, 80, 30, 50, -1, .5f));
+				// Silver
+				ret.Add(limitedGauss(TileDepth, 30, 100, 0, -1, 1.1f) + .002f);
 
-			// Rubin
-			ret.Add(limitedGauss(TileDepth, 200, 100, 80, -1, 1));
+				// Platinium
+				ret.Add(limitedGauss(TileDepth, 80, 30, 50, -1, .5f));
 
-			// Copper
-			ret.Add(limitedGauss(TileDepth, -20, 30, 0, -1, 0.7f) + .01f / (float)Math.Log(-TileDepth));
+				// Rubin
+				ret.Add(limitedGauss(TileDepth, 200, 100, 80, -1, 1));
 
-			// Saphire
-			ret.Add(limitedGauss(TileDepth, 150, 70, 70, -1, .6f));
+				// Copper
+				ret.Add(limitedGauss(TileDepth, -20, 30, 0, -1, 0.7f) + .01f / (float)Math.Log(-TileDepth));
 
+				// Saphire
+				ret.Add(limitedGauss(TileDepth, 150, 70, 70, -1, .6f));
+
+				// Salt
+				ret.Add(limitedGauss(TileDepth, -20, 30, 0, -1, 0.7f));
+
+				// Emerald
+				ret.Add(limitedGauss(TileDepth, 20, 30, 0, -1, 0.7f));
+			}
 
 			// Normalize
 			float sum = 0;
@@ -129,7 +135,7 @@ namespace MarsMiner
 
 		public static Mineral RandomByDepth(int TileDepth)
 		{
-			int rand = rnd.Next(0, 1000);
+			int rand = rnd.Next(1, 1000);
 			float normalizedRand = rand / 1000f;
 
 			var propabilities = CalcPropabilitesOnDepth(TileDepth);
@@ -137,7 +143,7 @@ namespace MarsMiner
 			int i = -1;
 			for (float f = 0; f < normalizedRand; f += propabilities[++i])
 				;
-
+			
 			switch (i) {
 			case (int) Type.Gold:
 				return Gold;
@@ -153,9 +159,13 @@ namespace MarsMiner
 				return Copper;
 			case 6:
 				return Saphire;
+			case 7:
+				return Salt;
+			case 8:
+				return Emerald;
 			}
 
-			return Gold;
+			throw new Exception();
 		}
 
 		public static bool operator==(Mineral m1, Mineral m2)
@@ -192,39 +202,18 @@ namespace MarsMiner
 
 		public int BasePrice()
 		{
-			switch (type) {
-			case Type.Copper:
-				return 5;
-
-			case Type.Silver:
-				return 20;
-
-			case Type.Lapis:
-				return 50;
-
-			case Type.Rubin:
-				return 65;
-
-			case Type.Gold:
-				return 100;
-
-			case Type.Saphire:
-				return 125;
-
-			case Type.Platinium:
-				return 250;
-			}
-
-			return 0;
+			return Prices[(int)type];
 		}
 
-		public static Mineral Gold = new Mineral(Type.Gold);
-		public static Mineral Silver = new Mineral(Type.Silver);
-		public static Mineral Lapis = new Mineral(Type.Lapis);
-		public static Mineral Rubin = new Mineral(Type.Rubin);
-		public static Mineral Saphire = new Mineral(Type.Saphire);
-		public static Mineral Copper = new Mineral(Type.Copper);
-		public static Mineral Platinium = new Mineral(Type.Platinium);
+		public static Mineral Gold = new Mineral(Type.Gold, Sprites.Name.TileGold);
+		public static Mineral Silver = new Mineral(Type.Silver, Sprites.Name.TileSilver);
+		public static Mineral Lapis = new Mineral(Type.Lapis, Sprites.Name.TileLapis);
+		public static Mineral Rubin = new Mineral(Type.Rubin, Sprites.Name.TileRubin);
+		public static Mineral Saphire = new Mineral(Type.Saphire, Sprites.Name.TileSaphire);
+		public static Mineral Copper = new Mineral(Type.Copper, Sprites.Name.TileCopper);
+		public static Mineral Platinium = new Mineral(Type.Platinium, Sprites.Name.TilePlatinium);
+		public static Mineral Salt = new Mineral(Type.Salt, Sprites.Name.TileSalt);
+		public static Mineral Emerald = new Mineral(Type.Emerald, Sprites.Name.TileEmerald);
 	}
 }
 

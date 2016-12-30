@@ -6,10 +6,10 @@ namespace MarsMiner
 	class CollisionTile : IComparable<CollisionTile>
 	{
 		public enum Position {
-			Left = 1,
-			Right = 3,
-			Top = 2,
 			Bottom = 0,
+			Left = 1,
+			Top = 2,
+			Right = 3,
 		}
 
 		public Tile tile;
@@ -20,7 +20,6 @@ namespace MarsMiner
 			this.tile = tile;
 			this.position = position;
 		}
-		
 
 		public bool breakable {
 			get {
@@ -70,7 +69,7 @@ namespace MarsMiner
 
 		public int CompareTo(CollisionTile other)
 		{
-			return position == other.position ? 0 : ((int)position > (int)other.position ? 1 : -1);
+			return (int)position - (int)other.position;
 		}
 	}
 }

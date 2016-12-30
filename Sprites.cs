@@ -33,6 +33,10 @@ namespace MarsMiner
 			TileNonBreakable2 = 20,
 			TileNonBreakable3 = 21,
 			TileNonBreakable4 = 22,
+			TileSalt = 23,
+			TileEmerald = 24,
+			BuildingGasStation = 25, // – 33
+			Shop = 33,
         }
 
         private const int size = 128;
@@ -57,10 +61,10 @@ namespace MarsMiner
             spriteTextures.Bind();
         }
 
-        public static void TexCoord(Name sprite, int coord)
+		public static void TexCoord(Name sprite, int coord, int SpriteAdd = 0)
         {
-            int i = (int)sprite % x_range;
-            int j = (int)sprite / x_range;
+			int i = ((int)sprite + SpriteAdd) % x_range;
+			int j = ((int)sprite + SpriteAdd) / x_range;
             switch (coord)
             {
                 case 0:

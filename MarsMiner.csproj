@@ -107,6 +107,9 @@
     <Compile Include="MainSystem.cs" />
     <Compile Include="CollisionTile.cs" />
     <Compile Include="BreakingTile.cs" />
+    <Compile Include="RepairShop.cs" />
+    <Compile Include="Preferences.cs" />
+    <Compile Include="WindowObjectBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -14,10 +14,14 @@ namespace MarsMiner
 			var ret = new List<Building>();
 
 			ret.Add(new GasStation(m,r));
-			ret[0].onClose += onClose;
 
 			ret.Add(new Shop(m,r));
-			ret[1].onClose += onClose;
+
+			ret.Add(new RepairShop(m,r));
+
+			foreach (var b in ret) {
+				b.onClose += onClose;
+			}
 
 			return ret;
 		}

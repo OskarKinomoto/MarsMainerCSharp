@@ -11,6 +11,11 @@ namespace MarsMiner
 			Standard
 		}
 
+		public Fuel()
+		{
+			bar.Set(Percentage());
+		}
+
 		private Model model = Model.Standard;
 		private float current = 500;
 
@@ -32,6 +37,9 @@ namespace MarsMiner
 
 		public void Use(float fuelUse)
 		{
+			if (Preferences.GodMode)
+				return;
+			
 			current -= fuelUse;
 
 			if (current <= 0)

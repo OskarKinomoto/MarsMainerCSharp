@@ -54,6 +54,9 @@ namespace MarsMiner
 
 		public void Loose(float lifeAmount)
 		{
+			if (Preferences.GodMode)
+				return;
+			
 			current -= lifeAmount;
 
 			if (current <= 0)

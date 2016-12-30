@@ -11,14 +11,25 @@ namespace MarsMiner
 		protected int LeftXPosition;
 		protected int RightXPosition;
 
+		protected int TextureXWidth;
+		protected int TextureYHeight;
+		protected Sprites.Name sprite;
+
 		Textures TextureEnterText;
 
 		protected Window window;
 
 		public event Action onClose;
 
-		public Building(String s)
+		public Building(String s, int TextureXWidth, int TextureYHeight, Sprites.Name sprite, int LeftX)
 		{
+			this.TextureXWidth = TextureXWidth;
+			this.TextureYHeight = TextureYHeight;
+			this.sprite = sprite;
+
+			LeftXPosition = LeftX* Tile.Size;
+			RightXPosition = LeftXPosition + TextureXWidth * Tile.Size;
+
 			window = new Window(600, 400, s);
 			window.onClose += Close;
 			TextureEnterText = Textures.Text("Press E to enter " + s, Textures.FontName.Tahoma, 12);
@@ -46,12 +57,16 @@ namespace MarsMiner
 
 		virtual public void Paint()
 		{
-			Vector2 position = new Vector2(LeftXPosition, 0);
-			Vector2 size = new Vector2(-LeftXPosition + RightXPosition, 100);
+			Vector2 position = new Vector2(LeftXPosition, (TextureYHeight - 1) * Tile.Size);
+			Vector2 size = new Vector2(Tile.Size, Tile.Size);
 
-			Painter.DisableTextures();
-			Painter.Color(.8f, .8f, .8f);
-			Painter.Square(position, size, 1);
+			Sprites.Bind();
+			Painter.EnableTextures();
+			Painter.StartQuads();
+			for (int i = 0; i < TextureYHeight; ++i)
+				for (int j = 0; j < TextureXWidth; ++j)
+					Painter.Sprite(position + new Vector2(Tile.Size * j, -i * Tile.Size), size, sprite, 3, i * TextureXWidth + j);
+			
 		}
 
 		public void PaintBuildingMenu()

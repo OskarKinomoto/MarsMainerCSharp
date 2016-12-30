@@ -31,7 +31,7 @@ namespace MarsMiner
 				var left = (int)Math.Floor(b.left() / Tile.Size);
 				var right = (int)Math.Floor(b.right() / Tile.Size);
 
-				for (int x = left; x <= right; ++x)
+				for (int x = left; x < right; ++x)
 					tiles[x - Model.MinX, 0].breakable = false;
 			}
 		}
@@ -43,7 +43,7 @@ namespace MarsMiner
 			var xStart = (int)((-cam.X - Controler.WindowWidth / 2) / Tile.Size - 1);
 			var xEnd = (-cam.X + Controler.WindowWidth / 2) / Tile.Size + 1;
 
-			// Tiles only underground
+			// Tiles are only underground
 			if (yEnd > 0)
 				yEnd = 0;
 
@@ -110,7 +110,7 @@ namespace MarsMiner
 
 				bool isAnyVertexInTile = false;
 				foreach (Vector2 RobotVertex in RobotVertices) {
-					if (Tile.vertexInTile(tileReal, RobotVertex)) {
+					if (Tile.VertexInTile(tileReal, RobotVertex)) {
 						isAnyVertexInTile = true;
 						break;
 					}

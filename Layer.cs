@@ -30,6 +30,9 @@ namespace MarsMiner
 
 
 		public static Layer Robot = new Layer(5f);
+
+
+		public static Layer Window = new Layer(8f);
 		public static Layer StatusText = new Layer(10f);
 	}
 }

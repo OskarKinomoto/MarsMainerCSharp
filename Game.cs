@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace MarsMiner
 {
@@ -63,87 +64,69 @@ namespace MarsMiner
 			return GameOver;
 		}
 
+		private Tile TileToBreak(Vector2[] tilesOnRobot, Robot.Breaking robotStatusBreking)
+		{
+			var robotTilePosition = tilesOnRobot[0];
+
+			Func<Vector2, int, int, Tile> robotTilePosToTile = (vec, x, y) => {
+				return tiles[(int)vec.X + x, (int)vec.Y + y];
+			};
+
+			Tile tileToBreak = new Tile(0, 0, false);
+			switch (robotStatusBreking) {
+			case Robot.Breaking.Left:
+				tileToBreak = robotTilePosToTile(robotTilePosition, -1, 0);
+				break;
+			case Robot.Breaking.Right:
+				tileToBreak = robotTilePosToTile(robotTilePosition, 1, 0);
+				break;
+			case Robot.Breaking.Down:
+				robotTilePosition = robot.SelectBottomTile(tilesOnRobot);
+				tileToBreak = robotTilePosToTile(robotTilePosition, 0, 1);
+				break;
+			}
+
+			return tileToBreak;
+		}
+
+		private void ProcessBreakingTile(Vector2[] tilesOnRobot, Robot.Breaking robotStatusBreking, bool robotOldStatus)
+		{
+			Tile tileToBreak = TileToBreak(tilesOnRobot, robotStatusBreking);
+
+			if (tileToBreak.exists) {
+				if (tileToBreak.breakable) {
+					robot.breakingTile = tileToBreak.setCollision();
+					robot.SetMineralToRecieve(tileToBreak.GetMineral());
+				} else {
+					robot.SetStateToUser();
+				}
+			} else if (!robotOldStatus && robot.IsBreaking()) {
+				robot.SetStateToUser();
+			}
+		}
 
 		public void tick(float tau)
 		{
 			try {
-				Robot.Breaking userBreaking = Robot.Breaking.None;
-
-				// ---------- PHYSICS ------------
-
-				// TODO switch to by angle breaking recoginition
-				if (workingForces.Y < 0)
-					userBreaking = Robot.Breaking.Down;
-
-				if (workingForces.Y > 0)
-					userBreaking = Robot.Breaking.Up;
-
-				if (workingForces.X > 0)
-					userBreaking = Robot.Breaking.Right;
-            
-				if (workingForces.X < 0)
-					userBreaking = Robot.Breaking.Left;
-
-
-				Vector2 frictionForce = new Vector2();
-				if (workingForces.X == 0 && robot.m_velocity.Y == 0 && robot.m_velocity.X != 0) {
-					frictionForce.X = -10 * Math.Sign(robot.m_velocity.X) * 
-						(float)Math.Pow(Math.Abs(robot.m_velocity.X), 1 / 2.0f) 
-						* Physics.FrictionForceConst;
-				}
-
-				if (robot.m_velocity.Y == 0)
-					frictionForce.X += -robot.m_velocity.X * Physics.FrictionForceConst; 
-
-				robot.forces = workingForces + frictionForce + Physics.DragForce(robot.m_velocity) + Physics.GravityForce;
+				float angle = (float)Math.Atan2(workingForces.Y, workingForces.X);
+				robot.SetEngine(workingForces.LengthSquared > 0, angle);
 
 				// ---------- TILE BREAKING ------------
 
 				var tilesOnRobot = tiles.TilesOnRobot(robot);
 				var collisionTiles = tiles.CollisionTiles(tilesOnRobot);
 
-
-				Robot.Breaking robotStatusBreking = Robot.Breaking.None;
+				Robot.Breaking robotStatusBreaking = Robot.Breaking.None;
 				var breakingTileOld = robot.breakingTile;
 
 				var robotOldStatus = robot.IsBreaking();
 
-				robot.Tick(tau, collisionTiles, userBreaking, out robotStatusBreking);
+				robot.Tick(tau, collisionTiles, out robotStatusBreaking);
 
-				if (breakingTileOld.Z != 0 && robot.breakingTile.Z == 0) {
-					tiles[(int)breakingTileOld.X - MinX, -(int)breakingTileOld.Y].destroy();
-				}
+				if (!breakingTileOld.destroyed && robot.breakingTile.destroyed)
+					breakingTileOld.tile.destroy();
 
-				var robotTilePosition = tilesOnRobot[0];
-
-				Func<Vector2, int, int, Tile> robotTilePosToTile = (vec, x, y) => {
-					return tiles[(int)vec.X + x, (int)vec.Y + y];
-				};
-
-				Tile tileToBreak = new Tile(0, 0, false);
-				switch (robotStatusBreking) {
-				case Robot.Breaking.Left:
-					tileToBreak = robotTilePosToTile(robotTilePosition, -1, 0);
-					break;
-				case Robot.Breaking.Right:
-					tileToBreak = robotTilePosToTile(robotTilePosition, 1, 0);
-					break;
-				case Robot.Breaking.Down:
-					robotTilePosition = robot.SelectBottomTile(tilesOnRobot);
-					tileToBreak = robotTilePosToTile(robotTilePosition, 0, 1);
-					break;
-				}
-
-				if (tileToBreak.exists) {
-					if (tileToBreak.breakable) {
-						tileToBreak.setCollision(ref robot.breakingTile);
-						robot.SetMineralToRecieve(tileToBreak.GetMineral());
-					} else {
-						robot.SetStateToUser();
-					}
-				} else if (!robotOldStatus && robot.IsBreaking()) {
-					robot.SetStateToUser();
-				}
+				ProcessBreakingTile(tilesOnRobot, robotStatusBreaking, robotOldStatus);
 
 			} catch (GameOverException) {
 				GameOver = true;

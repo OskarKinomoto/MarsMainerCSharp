@@ -43,7 +43,7 @@ namespace MarsMiner
 			this.height = height;
 			SetTitle(title);
 
-			WindowButton closeBtn = new WindowButton(0, 0, WindowButton.Type.Close, this, WindowButton.Position.Right, Layer.StatusText);
+			WindowButton closeBtn = new WindowButton(new System.Drawing.Point(0, 0), WindowButton.Type.Close, this, WindowButton.Align.Right, Layer.StatusText);
 			closeBtn.setOnClickEvent(Close);
 			Add(closeBtn);
 		}

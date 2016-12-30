@@ -53,7 +53,7 @@ namespace MarsMiner
 		}
 
 
-		public Vector3 breakingTile = new Vector3(0, 0, 0);
+		public BreakingTile breakingTile = new BreakingTile();
 
 		// geometry + painter
 		public const float Size = Tile.Size * .8f;
@@ -61,8 +61,7 @@ namespace MarsMiner
 
 		// physics
 		public Vector2 m_position = new Vector2(0, 10);
-		public Vector2 m_velocity = new Vector2(0, 0);
-		public Vector2 forces = new Vector2(0, 0);
+		public Vector2 velocity = new Vector2(0, 0);
 		public float mass = 1;
 
 		// State
@@ -103,6 +102,16 @@ namespace MarsMiner
 			fuel.Add(FuelAmount);
 		}
 
+		public float HealthMissing()
+		{
+			return hull.Missing();
+		}
+
+		public void Repair(float FuelAmount)
+		{
+			hull.Heal(FuelAmount);
+		}
+
 		public List<Mineral> Minerals()
 		{
 			return cargo.Minerals();
@@ -111,6 +120,12 @@ namespace MarsMiner
 		public void MineralsClean()
 		{
 			cargo.Clean();
+		}
+
+		public void SetEngine(bool running, float angle = 0)
+		{
+			engine.angle = angle;
+			engine.running = running;
 		}
 		// END of Interfaces to Status
 
@@ -154,22 +169,22 @@ namespace MarsMiner
 
 		public bool IsMoving()
 		{
-			return m_velocity.LengthSquared != 0;
+			return velocity.LengthSquared != 0;
 		}
 
 		public bool IsMovingVerticaly()
 		{
-			return m_velocity.X != 0;
+			return velocity.X != 0;
 		}
 
 		public bool IsMovingHorizontaly()
 		{
-			return m_velocity.Y != 0;
+			return velocity.Y != 0;
 		}
 
 		private void StopMoving()
 		{
-			m_velocity = new Vector2();
+			velocity = new Vector2();
 		}
 
 		private void RecieveMineral()
@@ -180,18 +195,20 @@ namespace MarsMiner
 			MineralToRecieve = null;
 		}
 
-		private void SetHorizontalPosition(float X) {
+		private void SetHorizontalPosition(float X)
+		{
 			m_position.X = X;
-			m_velocity.X = 0;
+			velocity.X = 0;
 		}
 
-		private void SetVerticalPosition(float Y) {
+		private void SetVerticalPosition(float Y)
+		{
 			m_position.Y = Y;
-			m_velocity.Y = 0;
+			velocity.Y = 0;
 		}
 
 		// TICKS
-		public void Tick(float tau, CollisionTile[] collisionTiles, Breaking user, out Breaking b)
+		public void Tick(float tau, CollisionTile[] collisionTiles, out Breaking b)
 		{
 			b = Breaking.None;
 
@@ -200,7 +217,7 @@ namespace MarsMiner
 			switch (state) {
 
 			case State.UserControled:
-				TickUser(tau, collisionTiles, out b, user);
+				TickUser(tau, collisionTiles, out b);
 				break;
 
 			case State.Breaking:
@@ -213,7 +230,7 @@ namespace MarsMiner
 		{
 			fuel.Use(drill.FuelUsage() * tau);
 
-			var tile = new Vector2 (breakingTile.X * Tile.Size + (Tile.Size - Size) / 2, (breakingTile.Y - 1) * Tile.Size);
+			var tile = new Vector2(breakingTile.tile.PosX * Tile.Size + (Tile.Size - Size) / 2, (breakingTile.tile.PosY - 1) * Tile.Size + 1);
 
 			var d = tile - m_position;
 			var dist = d.Length;
@@ -222,25 +239,29 @@ namespace MarsMiner
 
 			if (dist <= move) {
 				m_position = tile;
-				breakingTile = new Vector3(0, 0, 0);
+				breakingTile = new BreakingTile();
 
 				RecieveMineral();
 				SetStateToUser();
+				drill.Heated();
 
 			} else {
 				m_position += d * move / dist;
 			}
 		}
 
-		private void TickUser(float tau, CollisionTile[] collisionTiles, out Breaking isBreaking, Breaking userMovement)
+		private void TickUser(float tau, CollisionTile[] collisionTiles, out Breaking isBreaking)
 		{
+			drill.Cool(tau);
+			bool canBreak = drill.Coolded() && engine.running;
+
 			isBreaking = Breaking.None;
 
-			possibleBreaking.breaking = userMovement;
+			possibleBreaking.breaking = engine.Breaking();
 
-			bool wasMovingAtBeginOfTick = m_velocity.LengthSquared > 0;
+			bool wasMovingAtBeginOfTick = velocity.LengthSquared > 0;
 
-			switch (userMovement) {
+			switch (engine.Breaking()) {
 			case Breaking.Left:
 				sprite = Sprites.Name.RobotLeft;
 				break;
@@ -250,23 +271,28 @@ namespace MarsMiner
 			}
 
 			// User move
-			if (userMovement != Breaking.None)
+			if (engine.Breaking() != Breaking.None)
 				fuel.Use((float)(engine.FuelUse() * tau));
 
+			// Physics
+			Vector2 forces = engine.Force() + Physics.Forces(engine.running, velocity, m_position.Y);
+
 			// forces -> velocity
-			m_velocity += forces * tau / mass;
+			velocity += forces * tau / mass;
 
-			if (Math.Abs(m_velocity.Y) < 1e-3 && userMovement != Breaking.Down)
-				m_velocity.Y = 0;
+			if (Math.Abs(velocity.Y) < 1e-3 && engine.Breaking() != Breaking.Down)
+				velocity.Y = 0;
 
-			if (Math.Abs(m_velocity.Y) > 1e-1)
+			if (Math.Abs(velocity.Y) > 1e-1)
 				possibleBreaking.LeftRight = false;
 			
-			if (Math.Abs(m_velocity.X) > 5)
+			if (Math.Abs(velocity.X) > 5)
 				possibleBreaking.Down = false;
 
+			var oldPosition = m_position;
+
 			// velocity -> position
-			m_position += m_velocity * tau;
+			m_position += velocity * tau;
             
 			// Stop at map endings
 			if (m_position.X < Model.MinTileX)
@@ -275,7 +301,7 @@ namespace MarsMiner
 			if (m_position.X + Robot.Size > Model.MaxTileX)
 				SetHorizontalPosition(Model.MaxTileX - Robot.Size);
 
-			var VelocityBeforeCollisions = wasMovingAtBeginOfTick ? m_velocity.Length : 0;
+			float VelocityBeforeCollisions = wasMovingAtBeginOfTick ? velocity.Length : 0;
 
 			// Magick algoithm – collisions and tile breaking
 			// TODO carefully refactor!! git etc to not break THE MAGICK!!
@@ -286,8 +312,8 @@ namespace MarsMiner
 				switch (tile.position) {
 
 				case CollisionTile.Position.Bottom:
-					if (possibleBreaking.IsDown && tile.breakable) {
-						if (isBreaking == Breaking.None && m_velocity.Y != 0) {
+					if (possibleBreaking.IsDown && tile.breakable && canBreak) {
+						if (isBreaking == Breaking.None && velocity.Y != 0) {
 							isBreaking = Breaking.Down;
 							possibleBreaking.Down = false;
 						}
@@ -298,7 +324,7 @@ namespace MarsMiner
 					break;
 
 				case CollisionTile.Position.Left:
-					if (possibleBreaking.IsLeft && tile.breakable)
+					if (possibleBreaking.IsLeft && tile.breakable && canBreak)
 						isBreaking = Breaking.Left;
 					else
 						SetHorizontalPosition(tile.left);
@@ -309,7 +335,7 @@ namespace MarsMiner
 					break;
 
 				case CollisionTile.Position.Right:
-					if (possibleBreaking.IsRight && tile.breakable)
+					if (possibleBreaking.IsRight && tile.breakable && canBreak)
 						isBreaking = Breaking.Right;
 					else
 						SetHorizontalPosition(tile.right);
@@ -319,9 +345,11 @@ namespace MarsMiner
 
 			if (isBreaking != Breaking.None)
 				SetStateToBreaking();
+			else if (Math.Abs(oldPosition.LengthSquared - m_position.LengthSquared) > Drill.MoveToHeatDrillSquared)
+				drill.Heated();
 
 			if (wasMovingAtBeginOfTick) {
-				var VelocityAfterCollisions = m_velocity.Length;
+				var VelocityAfterCollisions = velocity.Length;
 				hull.LooseByVelocityChange(VelocityBeforeCollisions, VelocityAfterCollisions);
 			}
 		}
