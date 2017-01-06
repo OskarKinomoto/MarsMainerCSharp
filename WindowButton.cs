@@ -5,7 +5,7 @@ using System.Drawing;
 
 namespace MarsMiner
 {
-	public class WindowButton : WindowObjectBase, MouseInterface
+	class WindowButton : WindowObjectBase, MouseInterface
 	{
 		public enum Type {
 			Normal,
@@ -15,11 +15,9 @@ namespace MarsMiner
 		private Type type;
 
 		public event Action onClickEvent;
-
-		private Vector2 size = new Vector2(20,20);
 		private float margin = 5;
 
-		private Textures text;
+		private Textures textTexture;
 
 		private bool focus = false;
 
@@ -30,22 +28,19 @@ namespace MarsMiner
 			this.parent = parent;
 
 			if (type != Type.Close) {
-				text = Textures.Text(s, Textures.FontName.Tahoma, 12);
-				size = new Vector2(20 + text.TextSize.Width, 30);
+				textTexture = Textures.Text(s, Textures.FontName.Tahoma, 12);
+				size = new Vector2(textTexture.TextSize.Width + 20, 30);
+			} else {
+				size = new Vector2(20);
 			}
 		}
 
-		public void setWidth(float width)
+		public void Width(float width)
 		{
 			size.X = 20 + width;
 		}
 
-		public void setOnClickEvent(Action onClickEvent)
-		{
-			this.onClickEvent = onClickEvent;
-		}
-
-		private Vector2 windowPosition() 
+		private Vector2 InWindowPosition() 
 		{
 			Vector2 ret = new Vector2(0, position.Y + size.Y + margin);
 
@@ -75,7 +70,7 @@ namespace MarsMiner
 			Painter.EnableTextures();
 			Painter.StartQuads();
 
-			var glPosition = parent.windowToRealPos(windowPosition());
+			var glPosition = parent.windowToRealPos(InWindowPosition());
 
 			if (type == Type.Close) {
 				Painter.Sprite(glPosition, size, focus ? Sprites.Name.CloseCircleFocus : Sprites.Name.CloseCircle, layer + 0.5f);
@@ -86,30 +81,30 @@ namespace MarsMiner
 				Painter.Sprite(glPosition + size - new Vector2(size.Y, size.Y), new Vector2(size.Y, size.Y), focus ? Sprites.Name.ButtonFocusRight : Sprites.Name.ButtonRight, layer);
 				Painter.Stop();
 
-				text.Bind();
-				Vector2 TextSize = new Vector2(text.SquareSize.Width, text.SquareSize.Height);
-				Painter.Square(glPosition - new Vector2(- (size.X - text.TextSize.Width) / 2, size.Y + (text.TextSize.Height) / 2.0f ), TextSize, layer + 0.01f);
+				textTexture.Bind();
+				Vector2 TextSize = new Vector2(textTexture.SquareSize.Width, textTexture.SquareSize.Height);
+				Painter.Square(glPosition - new Vector2(- (size.X - textTexture.TextSize.Width) / 2, size.Y + (textTexture.TextSize.Height) / 2.0f ), TextSize, layer + 0.01f);
 			}
 		}		
 
-		private Vector2 buttonPosition(Vector2 position)
+		private Vector2 InObjectPosition(Vector2 position)
 		{
-			position -= windowPosition();
+			position -= InWindowPosition();
 			position.Y += size.Y;
 			return position;
 		}
 
-		private bool FocusTest(Vector2 btnPosition)
+		private bool FocusTest(Vector2 inObjectPosition)
 		{
 			return 
-				btnPosition.X >= 0 && btnPosition.X <= size.X
+				inObjectPosition.X >= 0 && inObjectPosition.X <= size.X
 			&&
-				btnPosition.Y >= 0 && btnPosition.Y <= size.Y;
+				inObjectPosition.Y >= 0 && inObjectPosition.Y <= size.Y;
 		}
 
 		public void Mouse(Vector2 position, Mouse.Action action)
 		{
-			focus = FocusTest(buttonPosition(position));
+			focus = FocusTest(InObjectPosition(position));
 			
 			if (focus && action == MarsMiner.Mouse.Action.LeftClick) {
 				if (onClickEvent != null)
@@ -118,4 +113,3 @@ namespace MarsMiner
 		}
 	}
 }
-

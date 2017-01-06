@@ -10,7 +10,7 @@ namespace MarsMiner
 		
 		WindowButton sellAll;
 
-		public Shop(Money money, Robot robot) : base("Shop", 3, 4, Sprites.Name.Shop, 3)
+		public Shop(Money money, Robot robot) : base("Shop", 4, 2, Sprites.Name.Shop, 3)
 		{
 			this.money = money;
 			this.robot = robot;
@@ -19,7 +19,7 @@ namespace MarsMiner
 			lastButtonLayer++;
 
 			sellAll = new WindowButton(new Point(0,300), WindowButton.Type.Normal, window, WindowButton.Align.Center, lastButtonLayer, "Sell All");
-			sellAll.setWidth(475);
+			sellAll.Width(475);
 			sellAll.onClickEvent += SellAll;
 			window.Add(sellAll);
 		}

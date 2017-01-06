@@ -14,7 +14,7 @@ namespace MarsMiner
         private int Position = 0;
         private int MenuElements = 0;
 
-        private List<Textures> MenuTextureElements = new List<Textures>();
+		private List<Tuple<Textures, Textures, Action>> MenuTextureElements = new List<Tuple<Textures, Textures, Action>>();
         private Textures MenuTitle;
 
         private float nextMenuItemPos;
@@ -36,28 +36,24 @@ namespace MarsMiner
                 Position++;
         }
 
-        public int enter()
+        public void Enter()
         {
-            return Position;
+			MenuTextureElements[Position].Item3();
         }
 
-        public void reset()
+        public void Reset()
         {
             Position = 0;
-        }
+		}
 
-        public int AddItem(String s)
-        {
-            MenuElements++;
+		public void AddItem(String s, Action a)
+		{
+			MenuElements++;
 
-            //Text
-            var tex = Textures.Text(s, Textures.FontName.Tahoma, 18);
-            var tex2 = Textures.Text(s, Textures.FontName.Tahoma, 18, System.Drawing.Brushes.White);
-            MenuTextureElements.Add(tex);
-            MenuTextureElements.Add(tex2);
-
-            return MenuElements - 1;
-        }
+			var tex = Textures.Text(s, Textures.FontName.Tahoma, 18);
+			var tex2 = Textures.Text(s, Textures.FontName.Tahoma, 18, System.Drawing.Brushes.White);
+			MenuTextureElements.Add(Tuple.Create(tex, tex2, a));
+		}
 
         public void Paint()
         {
@@ -80,13 +76,9 @@ namespace MarsMiner
                 Textures tex;
 
                 if (i == Position)
-                {
-                    tex = MenuTextureElements[i * 2 + 1];
-                }
+					tex = MenuTextureElements[i].Item2;
                 else
-                {
-                    tex = MenuTextureElements[i * 2];
-                }
+					tex = MenuTextureElements[i].Item1;
 
                 var elementPosition = new Vector2(-tex.TextSize.Width / 2,
                     Controler.WindowHeight / 2 - tex.SquareSize.Height - nextMenuItemPos);

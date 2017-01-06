@@ -2,7 +2,7 @@
 
 namespace MarsMiner
 {
-	public class Mouse
+	class Mouse
 	{
 		public enum Action {
 			None,

@@ -261,18 +261,18 @@ namespace MarsMiner
 
 			bool wasMovingAtBeginOfTick = velocity.LengthSquared > 0;
 
-			switch (engine.Breaking()) {
-			case Breaking.Left:
-				sprite = Sprites.Name.RobotLeft;
-				break;
-			case Breaking.Right:
-				sprite = Sprites.Name.RobotRight;
-				break;
-			}
+			if (engine.running) {
+				switch (engine.Breaking()) {
+				case Breaking.Left:
+					sprite = Sprites.Name.RobotLeft;
+					break;
+				case Breaking.Right:
+					sprite = Sprites.Name.RobotRight;
+					break;
+				}
 
-			// User move
-			if (engine.Breaking() != Breaking.None)
 				fuel.Use((float)(engine.FuelUse() * tau));
+			}
 
 			// Physics
 			Vector2 forces = engine.Force() + Physics.Forces(engine.running, velocity, m_position.Y);

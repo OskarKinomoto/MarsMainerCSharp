@@ -3,7 +3,7 @@ using OpenTK;
 
 namespace MarsMiner
 {
-	public interface MouseInterface
+	interface MouseInterface
 	{
 		void Mouse(Vector2 position, Mouse.Action action);
 	}

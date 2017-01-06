@@ -14,7 +14,7 @@ namespace MarsMiner
 		WindowButton refill20;
 		WindowButton refill50;
 
-		public RepairShop(Money m, Robot r) : base("Mechanic", 2, 4, Sprites.Name.Empty3, 11)
+		public RepairShop(Money m, Robot r) : base("Repair Shop", 3, 2, Sprites.Name.RepairShop, 11)
 		{
 			this.m = m;
 			this.r = r;
@@ -23,35 +23,35 @@ namespace MarsMiner
 			lastButtonLayer++;
 
 			fullRefill = new WindowButton(new Point(0,300), WindowButton.Type.Normal, window, WindowButton.Align.Center, lastButtonLayer, "Full repair");
-			fullRefill.setWidth(475);
+			fullRefill.Width(475);
 			fullRefill.onClickEvent += () => {
 				this.repair(10000);
 			};
 			window.Add(fullRefill);
 
 			refill5 = new WindowButton(new Point(50,100), WindowButton.Type.Normal, window, WindowButton.Align.Left, lastButtonLayer, "5$ repair");
-			refill5.setWidth(200);
+			refill5.Width(200);
 			refill5.onClickEvent += () => {
 				this.repair(5);
 			};
 			window.Add(refill5);
 
 			refill10 = new WindowButton(new Point(50,100), WindowButton.Type.Normal, window, WindowButton.Align.Right, lastButtonLayer + 0.2f,  "10$ repair");
-			refill10.setWidth(200);
+			refill10.Width(200);
 			refill10.onClickEvent += () => {
 				this.repair(10);
 			};
 			window.Add(refill10);
 
 			refill20 = new WindowButton(new Point(50,200), WindowButton.Type.Normal, window, WindowButton.Align.Left, lastButtonLayer, "20$ repair");
-			refill20.setWidth(200);
+			refill20.Width(200);
 			refill20.onClickEvent += () => {
 				this.repair(20);
 			};
 			window.Add(refill20);
 
 			refill50 = new WindowButton(new Point(50,200), WindowButton.Type.Normal, window, WindowButton.Align.Right, lastButtonLayer + 0.2f,  "50$ repair");
-			refill50.setWidth(200);
+			refill50.Width(200);
 			refill50.onClickEvent += () => {
 				this.repair(50);
 			};

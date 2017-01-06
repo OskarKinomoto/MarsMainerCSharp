@@ -89,7 +89,7 @@ namespace MarsMiner
 
 
 			if (Preferences.MineralsDeveloper) {
-				int max = (int)Enum.GetValues(typeof(Type)).Cast<Type>().Last();
+				int max = (int)Enum.GetValues(typeof(Type)).Cast<Type>().Count();
 				for (int i = 0; i < max; ++i) {
 					ret.Add(1);
 				}

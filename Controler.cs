@@ -117,18 +117,31 @@ namespace MarsMiner
 		private void MenuInitialize()
 		{
 			gameOverMenu = new Menu("Gameover");
-			gameOverMenu.AddItem("New game");
-			gameOverMenu.AddItem("Exit");
+			gameOverMenu.AddItem("New game", NewGame);
+			gameOverMenu.AddItem("Exit", Exit);
 
 			mainMenu = new Menu("MarsMiner");
-			mainMenu.AddItem("New game");
-			mainMenu.AddItem("Exit");
+			mainMenu.AddItem("New game", NewGame);
+			mainMenu.AddItem("Exit", Exit);
 
 			inGameMenu = new Menu("Pause");
-			inGameMenu.AddItem("Resume");
-			inGameMenu.AddItem("Exit");
+			inGameMenu.AddItem("Resume", StateToGame);
+			inGameMenu.AddItem("Exit", Exit);
 
 			currentMenu = mainMenu;
+		}
+
+		private void Exit()
+		{
+			currentMenu = null;
+			state = State.Closing;
+		}
+
+		private void NewGame()
+		{
+			m.NewGame(StateToGame);
+			currentMenu = null;
+			state = State.Loaded;
 		}
 
 		private bool isInMenu()
@@ -201,6 +214,12 @@ namespace MarsMiner
 			Painter.Gradient(
 				new Vector2(Model.MinTileX, 0), new Vector3(.37f, .22f, .07f),
 				new Vector2(Model.MaxTileX, -50 * Tile.Size), new Vector3(.26f, .15f, .03f),
+				Layer.Background
+			);
+
+			Painter.Gradient(
+				new Vector2(Model.MaxTileX, -50 * Tile.Size), new Vector3(.26f, .15f, .03f),
+				new Vector2(Model.MinTileX, -100 * Tile.Size), new Vector3(.15f, .08f, .01f),
 				Layer.Background
 			);
 
@@ -304,52 +323,8 @@ namespace MarsMiner
 		{
 			if (keyDown && !_enter) {
 				mouseActive = false;
-				if (state == State.GameOver) {
-					var ret = currentMenu.enter();
-					switch (ret) {
-					case 0:
-						m.NewGame(StateToGame);
-						currentMenu = null;
-						state = State.Loaded;
-						break;
-
-					case 1:
-						currentMenu = null;
-						state = State.Closing;
-						break;
-					}
-				}
-
-				if (state == State.MainMenu) {
-					var ret = currentMenu.enter();
-					switch (ret) {
-					case 0:
-						m.NewGame(StateToGame);
-						currentMenu = null;
-						state = State.Loaded;
-						break;
-
-					case 1:
-						currentMenu = null;
-						state = State.Closing;
-						break;
-					}
-				}
-
-				if (state == State.InGameMenu) {
-					var ret = currentMenu.enter();
-					switch (ret) {
-					case 0:
-						currentMenu = null;
-						state = State.InGame;
-						break;
-
-					case 1:
-						currentMenu = null;
-						state = State.Closing;
-						break;
-					}
-				}
+				if (currentMenu != null)
+					currentMenu.Enter();				
 			}
 		}
 

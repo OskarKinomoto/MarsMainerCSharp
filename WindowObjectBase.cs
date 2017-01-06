@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Drawing;
+using OpenTK;
 
 namespace MarsMiner
 {
-	public abstract class WindowObjectBase : PaintInterface
+	abstract class WindowObjectBase : PaintInterface
 	{
 		// Types
 		public enum Align {
@@ -17,6 +18,7 @@ namespace MarsMiner
 		protected Layer layer;
 		protected Point position;
 		protected Align align;
+		protected Vector2 size;
 
 		// Ctor
 		public WindowObjectBase(Window parent, Layer layer, Point position, Align align)

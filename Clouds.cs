@@ -6,7 +6,7 @@ namespace MarsMiner
 {
 	public class Clouds : PaintInterface
 	{
-		private const float WindConstant = 70;
+		private readonly float WindConstant = 70;
 
 		Textures cloudsTexture;
 		bool loaded = false;
@@ -14,6 +14,12 @@ namespace MarsMiner
 
 		private float move_x = 0;
 		private float positionY = 200;
+
+		public Clouds()
+		{
+			if (Preferences.GodMode)
+				WindConstant = 200;
+		}
 
 		public void Load()
 		{

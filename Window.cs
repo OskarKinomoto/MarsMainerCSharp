@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace MarsMiner
 {
-	public class Window : PaintInterface, MouseInterface
+	class Window : PaintInterface, MouseInterface
 	{
 		private const int WindowBarWidth = 30;
 		private const int WindowBarMArgin = 2;
@@ -44,7 +44,7 @@ namespace MarsMiner
 			SetTitle(title);
 
 			WindowButton closeBtn = new WindowButton(new System.Drawing.Point(0, 0), WindowButton.Type.Close, this, WindowButton.Align.Right, Layer.StatusText);
-			closeBtn.setOnClickEvent(Close);
+			closeBtn.onClickEvent += Close;
 			Add(closeBtn);
 		}
 
