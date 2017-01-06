@@ -21,7 +21,7 @@ namespace MarsMiner
 			switch (m) {
 			case Model.Standard:
 			default:
-				return Tile.Size;
+				return Tile.Size * 1.5f;
 			}
 		}
 

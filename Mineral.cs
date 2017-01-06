@@ -21,18 +21,17 @@ namespace MarsMiner
 			Salt = 7,
 			Emerald = 8,
 		}
-
-		private readonly int[] Prices = new int[]{ 100, 50, 20, 250, 65, 5, 125, 3, 35 };
 			
 		private readonly Sprites.Name sprite;
 		private readonly int price;
 
 		private Type type = Type.Gold;
 
-		private Mineral(Type type, Sprites.Name sprite)
+		private Mineral(Type type, Sprites.Name sprite, int price)
 		{
 			this.type = type;
 			this.sprite = sprite;
+			this.price = price;
 		}
 
 		public Sprites.Name GetSprite()
@@ -202,18 +201,18 @@ namespace MarsMiner
 
 		public int BasePrice()
 		{
-			return Prices[(int)type];
+			return price;
 		}
 
-		public static Mineral Gold = new Mineral(Type.Gold, Sprites.Name.TileGold);
-		public static Mineral Silver = new Mineral(Type.Silver, Sprites.Name.TileSilver);
-		public static Mineral Lapis = new Mineral(Type.Lapis, Sprites.Name.TileLapis);
-		public static Mineral Rubin = new Mineral(Type.Rubin, Sprites.Name.TileRubin);
-		public static Mineral Saphire = new Mineral(Type.Saphire, Sprites.Name.TileSaphire);
-		public static Mineral Copper = new Mineral(Type.Copper, Sprites.Name.TileCopper);
-		public static Mineral Platinium = new Mineral(Type.Platinium, Sprites.Name.TilePlatinium);
-		public static Mineral Salt = new Mineral(Type.Salt, Sprites.Name.TileSalt);
-		public static Mineral Emerald = new Mineral(Type.Emerald, Sprites.Name.TileEmerald);
+		public static Mineral Gold = new Mineral(Type.Gold, Sprites.Name.TileGold, 100);
+		public static Mineral Silver = new Mineral(Type.Silver, Sprites.Name.TileSilver, 20);
+		public static Mineral Lapis = new Mineral(Type.Lapis, Sprites.Name.TileLapis, 50);
+		public static Mineral Rubin = new Mineral(Type.Rubin, Sprites.Name.TileRubin, 65);
+		public static Mineral Saphire = new Mineral(Type.Saphire, Sprites.Name.TileSaphire, 125);
+		public static Mineral Copper = new Mineral(Type.Copper, Sprites.Name.TileCopper, 5);
+		public static Mineral Platinium = new Mineral(Type.Platinium, Sprites.Name.TilePlatinium, 250);
+		public static Mineral Salt = new Mineral(Type.Salt, Sprites.Name.TileSalt, 3);
+		public static Mineral Emerald = new Mineral(Type.Emerald, Sprites.Name.TileEmerald, 35);
 	}
 }
 

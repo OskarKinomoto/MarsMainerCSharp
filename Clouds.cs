@@ -17,7 +17,7 @@ namespace MarsMiner
 
 		public Clouds()
 		{
-			if (Preferences.GodMode)
+			if (Preferences.CloudsDeveloper)
 				WindConstant = 200;
 		}
 

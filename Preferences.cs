@@ -14,6 +14,8 @@ namespace MarsMiner
 		public static bool GodMode = true;
 
 		private static bool mineralsDev = true;
+		private static bool cloudsDev = true;
+
 
 		public static bool MineralsDeveloper {
 			get {
@@ -21,6 +23,15 @@ namespace MarsMiner
 			}
 			set {
 				mineralsDev = value;
+			}
+		}
+
+		public static bool CloudsDeveloper {
+			get {
+				return cloudsDev;
+			}
+			set {
+				cloudsDev = value;
 			}
 		}
 	}
