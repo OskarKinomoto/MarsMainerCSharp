@@ -110,6 +110,7 @@
     <Compile Include="RepairShop.cs" />
     <Compile Include="Preferences.cs" />
     <Compile Include="WindowObjectBase.cs" />
+    <Compile Include="EnhancementShop.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

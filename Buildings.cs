@@ -19,6 +19,8 @@ namespace MarsMiner
 
 			ret.Add(new RepairShop(m,r));
 
+			ret.Add(new EnhancementShop(m,r));
+
 			foreach (var b in ret) {
 				b.onClose += onClose;
 			}

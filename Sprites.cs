@@ -37,7 +37,8 @@ namespace MarsMiner
 			TileEmerald = 24,
 			BuildingGasStation = 25, // – 30
 			Shop = 31, // – 38
-			RepairShop = 39
+			RepairShop = 39, // – 44
+			EnhancementShop = 45, // – 52
         }
 
         private const int size = 128;
