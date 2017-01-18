@@ -117,6 +117,7 @@
     <Compile Include="TrapezoidDistribution.cs" />
     <Compile Include="WindowLayoutBase.cs" />
     <Compile Include="WindowOneItemLayout.cs" />
+    <Compile Include="Keyboard.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

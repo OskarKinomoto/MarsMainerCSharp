@@ -61,15 +61,8 @@ namespace MarsMiner
 			
 			c.Tick((float)time);
 
-
-			// TODO create function recieving all keyboard state? 
-            c.down(Keyboard[Key.Down]);
-            c.up(Keyboard[Key.Up]);
-            c.left(Keyboard[Key.Left]);
-            c.right(Keyboard[Key.Right]);
-			c.enter(Keyboard[Key.Enter] || Keyboard[Key.KeypadEnter]);
-			c.esc(Keyboard[Key.Escape]);
-			c.keyE(Keyboard[Key.E]);
+			c.keys.UpdateArrows(Keyboard[Key.Up], Keyboard[Key.Down], Keyboard[Key.Left], Keyboard[Key.Right]);
+			c.keys.UpdateRest(Keyboard[Key.Enter] || Keyboard[Key.KeypadEnter], Keyboard[Key.Escape], Keyboard[Key.E]);
 
             if (c.isClosing())
                 Exit();

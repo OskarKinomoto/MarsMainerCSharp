@@ -35,13 +35,7 @@ namespace MarsMiner
 		private const float LAYER_BG = -10;
 		private const float LAYER_TEXT = 10;
 
-		private bool _up = false;
-		private bool _down = false;
-		private bool _left = false;
-		private bool _right = false;
-		private bool _enter = false;
-		private bool _esc = false;
-		private bool _e = false;
+		public Keyboard keys = new Keyboard();
 
 		private bool mouseActive = false;
 		private bool mouseLeftClick = false;
@@ -118,6 +112,24 @@ namespace MarsMiner
 
 			foreach (Building b in m.GetBuildings)
 				b.onClose += StateToGame;
+
+			keys.onEnter += () => {
+				if (currentMenu != null)
+					currentMenu.Enter();
+			};
+
+			keys.onUp += () => {
+				if (currentMenu != null)
+					currentMenu.up();
+			};
+
+			keys.onDown += () => {
+				if (currentMenu != null)
+					currentMenu.down();
+			};
+
+			keys.onE += enterBuilding;
+			keys.onEsc += menuEsc;
 		}
 
 		private void MenuInitialize()
@@ -202,8 +214,6 @@ namespace MarsMiner
 			} else if (state == State.Loaded) {
 				state = State.InGame;
 			}
-
-			// GC.Collect(); // otherwise it eats a lot of memory
 		}
 
 		private void RenderBackground()
@@ -246,17 +256,7 @@ namespace MarsMiner
 			}
 
 			if (state == State.InGame) {
-				var KeyboardArrows = new Vector2();
-				if (_up)
-					KeyboardArrows.Y += 1;
-				if (_down)
-					KeyboardArrows.Y -= 1;
-				if (_left)
-					KeyboardArrows.X -= 1;
-				if (_right)
-					KeyboardArrows.X += 1;
-
-				m.robot.SetEngine(KeyboardArrows.LengthSquared > 0, (float)Math.Atan2(KeyboardArrows.Y, KeyboardArrows.X));
+				m.robot.SetEngine(keys.EngineState());
 				
 				m.tick(tau);
 
@@ -270,44 +270,19 @@ namespace MarsMiner
 				clouds.Tick(tau);
 		}
 
-		private void menuEsc(bool keyDown)
+		private void menuEsc()
 		{
-			if (keyDown && !_esc) {
-				mouseActive = false;
-
-				if (state == State.InGame) {
-					state = State.InGameMenu;
-					currentMenu = inGameMenu;
-				} else if (state == State.InGameMenu) {
-					StateToGame();
-				} else if (state == State.InBuilding) {
-					StateToGame();
-				}
+			if (state == State.InGame) {
+				state = State.InGameMenu;
+				currentMenu = inGameMenu;
+			} else if (state == State.InGameMenu || state == State.InBuilding) {
+				StateToGame();
 			}
 		}
 
-		private void menuUp(bool keyDown)
+		private void enterBuilding()
 		{
-			if (keyDown && !_up) {
-				mouseActive = false;
-				if (currentMenu != null)
-					currentMenu.up();
-			}
-		}
-
-		private void menuDown(bool keyDown)
-		{
-			if (keyDown && !_down) {
-				mouseActive = false;
-				if (currentMenu != null)
-					currentMenu.down();
-			}
-		}
-
-		private void enterBuilding(bool keyDown)
-		{
-			if (keyDown && !_e) {
-				mouseActive = true;
+			if (isInGame()) {
 				if (activeBuilding == null) {
 					foreach (Building b in m.GetBuildings) {
 						if (b.CanEnter(m.robot)) {
@@ -320,59 +295,6 @@ namespace MarsMiner
 					activeBuilding.Close();
 				}
 			}
-		}
-
-		private void menuEnter(bool keyDown)
-		{
-			if (keyDown && !_enter) {
-				mouseActive = false;
-				if (currentMenu != null)
-					currentMenu.Enter();				
-			}
-		}
-
-		public void enter(bool state)
-		{
-			menuEnter(state);
-			_enter = state;
-		}
-
-		public void esc(bool state)
-		{
-			menuEsc(state);
-			_esc = state;
-		}
-
-		public void down(bool state)
-		{
-			menuDown(state);
-			_down = state;
-		}
-
-		public void up(bool state)
-		{
-			menuUp(state);
-			_up = state;
-		}
-
-		public void left(bool state)
-		{
-			if (state)
-				mouseActive = false;
-			_left = state;
-		}
-
-		public void right(bool state)
-		{
-			if (state)
-				mouseActive = false;
-			_right = state;
-		}
-
-		public void keyE(bool state)
-		{
-			enterBuilding(state);
-			_e = state;
 		}
 
 		public void mouse(Point pos)

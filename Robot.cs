@@ -133,6 +133,12 @@ namespace MarsMiner
 			engine.angle = angle;
 			engine.running = running;
 		}
+
+		public void SetEngine(Engine.State state)
+		{
+			engine.angle = state.angle;
+			engine.running = state.running;
+		}
 		// END of Interfaces to Status
 
 		// Paint interface

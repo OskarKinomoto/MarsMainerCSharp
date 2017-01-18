@@ -16,6 +16,18 @@ namespace MarsMiner
 			Standard
 		}
 
+		public class State
+		{
+			public bool running;
+			public float angle;
+
+			public State(bool running, float angle)
+			{
+				this.running = running;
+				this.angle = angle;
+			}
+		}
+
 		private Model model = Model.Standard;
 
 		public bool running = false;
