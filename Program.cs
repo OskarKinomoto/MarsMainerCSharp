@@ -86,7 +86,7 @@ namespace MarsMiner
 		protected override void OnMouseMove(MouseMoveEventArgs e)
 		{
 			base.OnMouseMove(e);
-			c.mouse(e.Position);
+			c.MouseMove(e.Position);
 		}
 
 		protected override void OnMouseDown(MouseButtonEventArgs e)

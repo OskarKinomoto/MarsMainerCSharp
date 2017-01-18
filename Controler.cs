@@ -37,11 +37,8 @@ namespace MarsMiner
 
 		public Keyboard keys = new Keyboard();
 
-		private bool mouseActive = false;
-		private bool mouseLeftClick = false;
-		private bool mouseLeftButton = false;
-		private Vector2 mousePosition = new Vector2(0, 0);
-		private bool mouseEventGenerate = false;
+		public Mouse mouse = new Mouse();
+		public event Action<bool> mouseVisible;
 
 		public static float WindowWidth = 0;
 		public static float WindowHeight = 0;
@@ -50,37 +47,10 @@ namespace MarsMiner
 
 		private State state = State.MainMenu;
 
-		public event Action<bool> mouseVisible;
-
-
 		public static Vector2 WindowSize {
 			get {
 				return new Vector2(WindowWidth, WindowHeight);
 			}
-		}
-
-		public Vector2 glToScreen(Vector2 glPoint)
-		{
-			return new Vector2(
-				glPoint.X + WindowWidth / 2,
-				glPoint.Y + WindowHeight / 2
-			);
-		}
-
-		public Point glToScreen(Point glPoint)
-		{
-			return new Point(
-				(int)(glPoint.X + WindowWidth / 2),
-				(int)(-glPoint.Y - WindowHeight / 2)
-			);
-		}
-
-		public Vector2 screenToGL(Vector2 screenPoint)
-		{
-			return new Vector2(
-				screenPoint.X - WindowWidth / 2,
-				screenPoint.Y - WindowHeight / 2
-			);
 		}
 
 		public Vector2 screenToGL(Point screenPoint)
@@ -130,6 +100,11 @@ namespace MarsMiner
 
 			keys.onE += enterBuilding;
 			keys.onEsc += menuEsc;
+
+			mouse.onMouseActive += () => {
+				if (mouseVisible != null)
+					mouseVisible(true);
+			};
 		}
 
 		private void MenuInitialize()
@@ -176,9 +151,6 @@ namespace MarsMiner
 		{
 			WindowWidth = width;
 			WindowHeight = height;
-
-			if (mouseVisible != null)
-				mouseVisible(mouseActive);
 
 			if (isInGame()) {
 				Painter.CameraMove(m.camera);
@@ -249,10 +221,9 @@ namespace MarsMiner
 
 		public void Tick(float tau)
 		{
-			if (mouseEventGenerate && activeBuilding != null) {
-				activeBuilding.Mouse(mousePosition, mouseLeftClick ? Mouse.Action.LeftClick : Mouse.Action.None);
-				mouseLeftClick = false;
-				mouseEventGenerate = false;
+			if (mouse.Event() && activeBuilding != null) {
+				activeBuilding.Mouse(mouse.Position(), mouse.action());
+				mouse.ResetEvent();
 			}
 
 			if (state == State.InGame) {
@@ -282,41 +253,31 @@ namespace MarsMiner
 
 		private void enterBuilding()
 		{
-			if (isInGame()) {
-				if (activeBuilding == null) {
-					foreach (Building b in m.GetBuildings) {
-						if (b.CanEnter(m.robot)) {
-							activeBuilding = b;
-							state = State.InBuilding;
-							break;
-						}
+			if (!isInGame())
+				return;
+			
+			if (activeBuilding == null) {
+				foreach (Building b in m.GetBuildings) {
+					if (b.CanEnter(m.robot)) {
+						activeBuilding = b;
+						state = State.InBuilding;
+						break;
 					}
-				} else {
-					activeBuilding.Close();
 				}
+			} else {
+				activeBuilding.Close();
 			}
+
 		}
 
-		public void mouse(Point pos)
+		public void MouseMove(Point pos)
 		{
-			var newPos = screenToGL(pos);
-			if (newPos != mousePosition) {
-				mousePosition = newPos;
-
-				mouseEventGenerate = true;
-				mouseActive = true;
-			}
+			mouse.Position(screenToGL(pos));
 		}
 
 		public void mouseClick(bool state)
 		{
-			if (mouseLeftButton && !state) {
-				mouseLeftClick = true;
-			}
-
-			mouseLeftButton = state;
-			mouseEventGenerate = true;
-			mouseActive = true;
+			mouse.LeftBtn(state);
 		}
 	}
 }
