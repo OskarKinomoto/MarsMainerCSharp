@@ -1,4 +1,10 @@
-﻿using OpenTK.Graphics.OpenGL;
+﻿/*
+ * Copyright (C) 2016-2017 Oskar Świtalski – All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
+ * Proprietary and confidential
+ */
+
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Drawing;
 using System.Linq;
