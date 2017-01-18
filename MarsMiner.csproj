@@ -111,6 +111,12 @@
     <Compile Include="Preferences.cs" />
     <Compile Include="WindowObjectBase.cs" />
     <Compile Include="EnhancementShop.cs" />
+    <Compile Include="Distribution.cs" />
+    <Compile Include="LinearDistribution.cs" />
+    <Compile Include="TriangleDistribution.cs" />
+    <Compile Include="TrapezoidDistribution.cs" />
+    <Compile Include="WindowLayoutBase.cs" />
+    <Compile Include="WindowOneItemLayout.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -46,22 +46,17 @@ namespace MarsMiner
 
 			switch (align) {
 			case Align.Right:
-				ret.X = parent.Width - position.X - size.X - margin;
+				ret.X = parent.Width() - position.X - size.X - margin;
 				break;
 			case Align.Left:
 				ret.X = position.X + margin;
 				break;
 			case Align.Center:
-				ret.X = (parent.Width - size.X) / 2;
+				ret.X = (parent.Width() - size.X) / 2;
 				break;
 			}
 
 			return ret;
-		}
-
-		public override void Paint()
-		{
-			throw new Exception();
 		}
 
 		public override void PaintOnScreen()
@@ -70,7 +65,7 @@ namespace MarsMiner
 			Painter.EnableTextures();
 			Painter.StartQuads();
 
-			var glPosition = parent.windowToRealPos(InWindowPosition());
+			var glPosition = ((Window)parent).windowToRealPos(InWindowPosition());
 
 			if (type == Type.Close) {
 				Painter.Sprite(glPosition, size, focus ? Sprites.Name.CloseCircleFocus : Sprites.Name.CloseCircle, layer + 0.5f);
@@ -102,7 +97,7 @@ namespace MarsMiner
 				inObjectPosition.Y >= 0 && inObjectPosition.Y <= size.Y;
 		}
 
-		public void Mouse(Vector2 position, Mouse.Action action)
+		public override void Mouse(Vector2 position, Mouse.Action action)
 		{
 			focus = FocusTest(InObjectPosition(position));
 			

@@ -118,7 +118,7 @@ namespace MarsMiner
 
 		private Sprites.Name RockTile()
 		{
-			int i = ((PosX + 991) * (PosY + 293)) % 4;
+			int i = ((PosX + 991) * (PosY + 293)) % 6;
 
 			switch (i) {
 			case 0:
@@ -129,6 +129,10 @@ namespace MarsMiner
 				return Sprites.Name.TileNonBreakable3;
 			case 3:
 				return Sprites.Name.TileNonBreakable4;
+			case 4:
+				return Sprites.Name.TileNonBreakable5;
+			case 5:
+				return Sprites.Name.TileNonBreakable6;
 			}
 
 			throw new Exception();

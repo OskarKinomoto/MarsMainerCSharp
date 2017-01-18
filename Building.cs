@@ -73,8 +73,6 @@ namespace MarsMiner
 		{
 			window.Open();
 			window.PaintOnScreen();
-			
-			const int margin = 20;
 		}
 
 		public bool CanEnter(Robot r)
@@ -86,7 +84,7 @@ namespace MarsMiner
 
 		public void Mouse(Vector2 position, Mouse.Action action)
 		{
-			window.Mouse(position, action);
+			window.Mouse(window.realToWindowPos(position), action);
 		}
 
 		public void Close()

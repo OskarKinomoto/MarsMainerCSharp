@@ -4,7 +4,7 @@ using OpenTK;
 
 namespace MarsMiner
 {
-	abstract class WindowObjectBase : PaintInterface
+	abstract class WindowObjectBase : PaintInterface, MouseInterface
 	{
 		// Types
 		public enum Align {
@@ -14,14 +14,14 @@ namespace MarsMiner
 		}
 
 		// Members
-		protected Window parent;
+		protected WindowObjectBase parent;
 		protected Layer layer;
 		protected Point position;
 		protected Align align;
 		protected Vector2 size;
 
 		// Ctor
-		public WindowObjectBase(Window parent, Layer layer, Point position, Align align)
+		public WindowObjectBase(WindowObjectBase parent, Layer layer, Point position, Align align)
 		{
 			this.parent = parent;
 			this.layer = layer;
@@ -30,8 +30,32 @@ namespace MarsMiner
 		}
 
 		// Methods
-		public abstract void Paint();
+		public void Paint()
+		{
+			throw new MissingMethodException();
+		}
+
 		public abstract void PaintOnScreen();
+
+		// Geters
+		public Layer getLayer()
+		{
+			return layer;
+		}
+
+		public float Width()
+		{
+			return size.X;
+		}
+
+		public float Height()
+		{
+			return size.Y;
+		}
+
+		virtual public void Mouse(Vector2 position, Mouse.Action action)
+		{
+		}
 	}
 }
 

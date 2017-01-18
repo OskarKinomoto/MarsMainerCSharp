@@ -1,16 +1,14 @@
 ﻿using System;
 using OpenTK;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace MarsMiner
 {
-	class Window : PaintInterface, MouseInterface
+	class Window : WindowObjectBase
 	{
 		private const int WindowBarWidth = 30;
 		private const int WindowBarMArgin = 2;
-
-		private int width;
-		private int height;
 		private bool isOpen = false;
 
 		private string Title = "";
@@ -18,29 +16,16 @@ namespace MarsMiner
 
 		public event Action onClose;
 
-		private List<WindowButton> buttons = new List<WindowButton>();
+		private List<WindowObjectBase> buttons = new List<WindowObjectBase>();
 
 		public void Add(WindowButton button)
 		{
 			buttons.Add(button);
 		}
 
-		public int Width {
-			get {
-				return this.width;
-			}
-		}
-
-		public int Height {
-			get {
-				return this.height;
-			}
-		}
-
-		public Window(int width, int height, string title)
+		public Window(int width, int height, string title) : base(null, Layer.Window, new Point(0,0), Align.Center)
 		{
-			this.width = width;
-			this.height = height;
+			size = new Vector2(width, height);
 			SetTitle(title);
 
 			WindowButton closeBtn = new WindowButton(new System.Drawing.Point(0, 0), WindowButton.Type.Close, this, WindowButton.Align.Right, Layer.StatusText);
@@ -69,30 +54,24 @@ namespace MarsMiner
 				onClose();
 		}
 
-		public void Paint()
-		{
-			throw new MissingMethodException();
-		}
-
-		public void PaintOnScreen()
+		override public void PaintOnScreen()
 		{
 			if (!isOpen)
 				return;
 			
-			Vector2 position = new Vector2(-width / 2, -height / 2);
-			Vector2 size = new Vector2(width, height);
+			Vector2 position = new Vector2(-Width() / 2, -Height() / 2);
+			Vector2 size = new Vector2(Width(), Height());
 			Painter.DisableTextures();
 			Painter.Color(.8f, .6f, .8f);
 			Painter.Square(position, size, 10);
 
 			Painter.Color(.8f, .5f, .8f);
-			Painter.Square(new Vector2(-width / 2, height / 2 - WindowBarWidth), new Vector2(width, WindowBarWidth), 10.1f);
-
+			Painter.Square(new Vector2(-Width() / 2, Height() / 2 - WindowBarWidth), new Vector2(Width(), WindowBarWidth), 10.1f);
 
 			Painter.EnableTextures();
 			TitleTex.Bind();
 			Vector2 size2 = new Vector2(TitleTex.SquareSize.Width, TitleTex.SquareSize.Height);
-			Painter.Square(new Vector2(-TitleTex.TextSize.Width / 2, height / 2 - 2 * WindowBarWidth - TitleTex.TextSize.Height + 10), size2, 10.11f);
+			Painter.Square(new Vector2(-TitleTex.TextSize.Width / 2, Height() / 2 - 2 * WindowBarWidth - TitleTex.TextSize.Height + 10), size2, 10.11f);
 
 
 			foreach (var btn in buttons)
@@ -101,23 +80,21 @@ namespace MarsMiner
 
 		public Vector2 windowToRealPos(Vector2 pos)
 		{
-			return new Vector2(pos.X - width / 2, -pos.Y + height / 2);
+			return new Vector2(pos.X - Width() / 2, -pos.Y + Height() / 2);
 		}
 
 		public Vector2 realToWindowPos(Vector2 pos)
 		{
-			return new Vector2(pos.X + width / 2, -pos.Y + height / 2);
+			return new Vector2(pos.X + Width() / 2, -pos.Y + Height() / 2);
 		}
 
 		public void Mouse(Vector2 position, Mouse.Action action)
 		{
-			Vector2 windowPosition = realToWindowPos(position);
-
-			if (windowPosition.X < 0 || windowPosition.Y < 0 || windowPosition.X > width || windowPosition.Y > height)
+			if (position.X < 0 || position.Y < 0 || position.X > Width() || position.Y > Height())
 				return;
 
 			foreach (var btn in buttons)
-				btn.Mouse(windowPosition, action);
+				btn.Mouse(position, action);
 		}
 	}
 }
