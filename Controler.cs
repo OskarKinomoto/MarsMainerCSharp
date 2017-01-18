@@ -240,20 +240,17 @@ namespace MarsMiner
 			}
 
 			if (state == State.InGame) {
-				// TODO forces from engine? or move it to model?
-				if (_up && !_down)
-					m.workingForces.Y = 180;
-				else if (_down && !_up)
-					m.workingForces.Y = -100;
-				else
-					m.workingForces.Y = 0;
+				var KeyboardArrows = new Vector2();
+				if (_up)
+					KeyboardArrows.Y += 1;
+				if (_down)
+					KeyboardArrows.Y -= 1;
+				if (_left)
+					KeyboardArrows.X -= 1;
+				if (_right)
+					KeyboardArrows.X += 1;
 
-				if (_left && !_right)
-					m.workingForces.X = -200;
-				else if (_right && !_left)
-					m.workingForces.X = 200;
-				else
-					m.workingForces.X = 0;
+				m.robot.SetEngine(KeyboardArrows.LengthSquared > 0, (float)Math.Atan2(KeyboardArrows.Y, KeyboardArrows.X));
 				
 				m.tick(tau);
 

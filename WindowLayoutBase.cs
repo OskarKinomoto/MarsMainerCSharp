@@ -15,6 +15,11 @@ namespace MarsMiner
 		abstract public void Add(WindowObjectBase obj);
 
 		abstract public void Add(WindowObjectBase obj, int x, int y);
+
+		public override void Mouse(OpenTK.Vector2 position, MarsMiner.Mouse.Action action)
+		{
+			base.Mouse(position, action);
+		}
 	}
 }
 

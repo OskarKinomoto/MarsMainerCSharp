@@ -108,9 +108,6 @@ namespace MarsMiner
 		public void tick(float tau)
 		{
 			try {
-				float angle = (float)Math.Atan2(workingForces.Y, workingForces.X);
-				robot.SetEngine(workingForces.LengthSquared > 0, angle);
-
 				// ---------- TILE BREAKING ------------
 
 				var tilesOnRobot = tiles.TilesOnRobot(robot);
@@ -127,7 +124,6 @@ namespace MarsMiner
 					breakingTileOld.tile.destroy();
 
 				ProcessBreakingTile(tilesOnRobot, robotStatusBreaking, robotOldStatus);
-
 			} catch (GameOverException) {
 				GameOver = true;
 			}
