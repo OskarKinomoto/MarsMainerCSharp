@@ -107,7 +107,7 @@ namespace MarsMiner
 
 		private bool genTile(int x, int y)
 		{
-			return rnd.Next(0, 7) != 0;
+			return rnd.Next(0, 11) != 0;
 		}
 
 		public static bool VertexInTile(Vector2 tile, Vector2 point)

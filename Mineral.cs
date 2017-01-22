@@ -186,15 +186,15 @@ namespace MarsMiner
 			return price;
 		}
 
-		public static Mineral Gold = new Mineral(Type.Gold, Sprites.Name.TileGold, 100, new TriangleDistribution(10, 100, 1));
-		public static Mineral Silver = new Mineral(Type.Silver, Sprites.Name.TileSilver, 20, new TriangleDistribution(10, 100, 1));
-		public static Mineral Lapis = new Mineral(Type.Lapis, Sprites.Name.TileLapis, 50, new TriangleDistribution(10, 100, 1));
-		public static Mineral Rubin = new Mineral(Type.Rubin, Sprites.Name.TileRubin, 65, new TriangleDistribution(10, 100, 1));
-		public static Mineral Saphire = new Mineral(Type.Saphire, Sprites.Name.TileSaphire, 125, new TriangleDistribution(10, 100, 1));
-		public static Mineral Copper = new Mineral(Type.Copper, Sprites.Name.TileCopper, 5, new TriangleDistribution(0, 300, 3));
-		public static Mineral Platinium = new Mineral(Type.Platinium, Sprites.Name.TilePlatinium, 250, new TriangleDistribution(10, 100, 1));
-		public static Mineral Salt = new Mineral(Type.Salt, Sprites.Name.TileSalt, 3, new TriangleDistribution(0, 25, 1));
-		public static Mineral Emerald = new Mineral(Type.Emerald, Sprites.Name.TileEmerald, 35, new TriangleDistribution(10, 100, 1));
+		public static Mineral Gold = new Mineral(Type.Gold, Sprites.Name.TileGold, 100, new TriangleDistribution(30, 100, 1));
+		public static Mineral Silver = new Mineral(Type.Silver, Sprites.Name.TileSilver, 20, new TriangleDistribution(0, 50, 1.5f));
+		public static Mineral Lapis = new Mineral(Type.Lapis, Sprites.Name.TileLapis, 50, new TriangleDistribution(50, 120, 1));
+		public static Mineral Rubin = new Mineral(Type.Rubin, Sprites.Name.TileRubin, 65, new TriangleDistribution(70, 200, 1));
+		public static Mineral Saphire = new Mineral(Type.Saphire, Sprites.Name.TileSaphire, 125, new TriangleDistribution(40, 300, 1));
+		public static Mineral Copper = new Mineral(Type.Copper, Sprites.Name.TileCopper, 5, new TriangleDistribution(0, 300, 4));
+		public static Mineral Platinium = new Mineral(Type.Platinium, Sprites.Name.TilePlatinium, 250, new TriangleDistribution(100, 300, 1));
+		public static Mineral Salt = new Mineral(Type.Salt, Sprites.Name.TileSalt, 3, new TriangleDistribution(0, 50, .3f));
+		public static Mineral Emerald = new Mineral(Type.Emerald, Sprites.Name.TileEmerald, 35, new TriangleDistribution(70, 170, 1));
 		public static Mineral Fe = new Mineral(Type.Fe, Sprites.Name.TileFe, 10, new TriangleDistribution(0, 200, 2));
 	}
 }
