@@ -14,7 +14,7 @@ namespace MarsMiner
 		private Physics(){}
 
 		public const float DragForceConst = .0008f;
-		public const float FrictionForceConst = .7f;
+		public const float FrictionForceConst = .65f;
 		public const float GravityForce2 = -80f;
 		public const float HeightForceConstant = .02f;
 
@@ -39,10 +39,10 @@ namespace MarsMiner
 		public static Vector2 FrictionForce(bool engineOn, Vector2 robotVelocity)
 		{
 			Vector2 frictionForce = new Vector2();
-			if (engineOn && robotVelocity.Y == 0 && robotVelocity.X != 0) {
+			if (!engineOn && robotVelocity.Y == 0 && robotVelocity.X != 0) {
 				frictionForce.X = -10 * Math.Sign(robotVelocity.X) *
-					(float)Math.Pow(Math.Abs(robotVelocity.X), 1 / 2.0f)
-					* Physics.FrictionForceConst * 2;
+					(float)Math.Pow(Math.Abs(robotVelocity.X), 1 / 3.0f)
+					* Physics.FrictionForceConst * 3;
 			}
 
 			if (robotVelocity.Y == 0)

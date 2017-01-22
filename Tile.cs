@@ -11,6 +11,14 @@ namespace MarsMiner
 {
 	class Tile
 	{
+		private enum State
+		{
+			None,
+			Exists,
+			Mineral,
+			NonBreakable,
+		}
+
 		static Random rnd = new Random();
 
 		// consts
@@ -21,24 +29,14 @@ namespace MarsMiner
 		public readonly int PosY;
 		public readonly Vector2 GamePosition;
 
-		private enum State
-		{
-			None,
-			Exists,
-			Mineral,
-			NonBreakable,
-		}
-
 		private Mineral mineral;
 
 		private State state = State.Exists;
 
 		private bool _collision = false;
 
-		public bool collision {
-			get {
+		public bool collision() {
 				return _collision;
-			}
 		}
 
 		public Mineral GetMineral()
@@ -90,13 +88,16 @@ namespace MarsMiner
 			GamePosition = new Vector2(PosX * Size, (PosY - 1) * Size);
 
 
-			if (y != 0) {
+			if (y != 0 && -y != Model.MaxYDepth - 20) {
 				state = genTile(x, y) ? State.Exists : State.None;
 
 				if (state == State.Exists && rnd.Next(0, 10) == 0) {
-						state = State.Mineral;
-						mineral = Mineral.RandomByDepth(y);
+					state = State.Mineral;
+					mineral = Mineral.RandomByDepth(y);
 				}
+			} else if(-y == Model.MaxYDepth - 20) {
+				state = State.Exists;
+				breakable = false;
 			} else {
 				state = State.Exists;
 			}
@@ -124,7 +125,7 @@ namespace MarsMiner
 
 		private Sprites.Name RockTile()
 		{
-			int i = ((PosX + 991) * (PosY + 293)) % 6;
+			int i = ((PosX + 991) * (PosY + 293)) % 8;
 
 			switch (i) {
 			case 0:
@@ -139,6 +140,10 @@ namespace MarsMiner
 				return Sprites.Name.TileNonBreakable5;
 			case 5:
 				return Sprites.Name.TileNonBreakable6;
+			case 6:
+				return Sprites.Name.TileNonBreakable7;
+			case 7:
+				return Sprites.Name.TileNonBreakable8;
 			}
 
 			throw new Exception();
@@ -165,7 +170,5 @@ namespace MarsMiner
 			if ((int)sprite != -1)
 				Painter.Sprite(GamePosition, new Vector2(Size, Size), sprite, 0.01f);
 		}
-
-
 	}
 }

@@ -75,7 +75,7 @@ namespace MarsMiner
 		private PossibleBreaking possibleBreaking = new PossibleBreaking();
 		private Mineral MineralToRecieve = null;
 
-		// Robot "status"
+		// Robot subsystems
 		private Fuel fuel = new Fuel();
 		private Cargo cargo = new Cargo();
 		private Hull hull = new Hull();
@@ -84,15 +84,15 @@ namespace MarsMiner
 		private Engine engine = new Engine();
 		private MainSystem mainsystem = new MainSystem();
 
-		private List<RobotStatusInterface> robotStatusInterface = new List<RobotStatusInterface>();
+		private List<RobotStatusInterface> subsystemInterface = new List<RobotStatusInterface>();
 
 		// Constructor
 		public Robot()
 		{
-			robotStatusInterface.AddRange(new RobotStatusInterface[]{ fuel, cargo, hull });
+			subsystemInterface.AddRange(new RobotStatusInterface[]{ fuel, cargo, hull });
 		}
 
-		// Interfaceses to Status
+		// Interfaceses to subsystems
 		public int FuelPercentage()
 		{
 			return fuel.Percentage();
@@ -128,6 +128,11 @@ namespace MarsMiner
 			cargo.Clean();
 		}
 
+		public void UpgradeEngine()
+		{
+			engine.Upgrade();
+		}
+
 		public void SetEngine(bool running, float angle = 0)
 		{
 			engine.angle = angle;
@@ -153,7 +158,7 @@ namespace MarsMiner
 
 		public void PaintOnScreen()
 		{
-			foreach (var status in robotStatusInterface)
+			foreach (var status in subsystemInterface)
 				status.Paint();
 		}
 		// END of Paint Interface
@@ -316,7 +321,6 @@ namespace MarsMiner
 			float VelocityBeforeCollisions = wasMovingAtBeginOfTick ? velocity.Length : 0;
 
 			// Magick algoithm – collisions and tile breaking
-			// TODO carefully refactor!! git etc to not break THE MAGICK!!
 			foreach (CollisionTile tile in collisionTiles) {
 				if (!tile.Colide(m_position))
 					continue;
@@ -370,9 +374,8 @@ namespace MarsMiner
 		// Geometry
 		public Vector2 SelectBottomTile(Vector2[] tiles)
 		{
-			if (tiles.Length == 1) {
+			if (tiles.Length == 1)
 				return tiles[0];
-			}
 
 			var robotCenter = Center();
 			var x01 = (tiles[0].X + Model.MinX) * Tile.Size;

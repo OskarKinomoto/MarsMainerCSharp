@@ -27,7 +27,7 @@ namespace MarsMiner
 
 		private bool focus = false;
 
-		public WindowButton(Point position, Type type, Window parent, Align align, Layer layer, string s = "")
+		public WindowButton(Point position, Type type, WindowObjectBase parent, Align align, Layer layer, string s = "")
 			: base(parent, layer, position, align)
 		{
 			this.type = type;
@@ -46,7 +46,7 @@ namespace MarsMiner
 			size.X = 20 + width;
 		}
 
-		private Vector2 InWindowPosition() 
+		override public Vector2 ObjectToGlPosition(Vector2 pos)
 		{
 			Vector2 ret = new Vector2(0, position.Y + size.Y + margin);
 
@@ -62,7 +62,7 @@ namespace MarsMiner
 				break;
 			}
 
-			return ret;
+			return parent.ObjectToGlPosition(ret);
 		}
 
 		public override void PaintOnScreen()
@@ -71,7 +71,7 @@ namespace MarsMiner
 			Painter.EnableTextures();
 			Painter.StartQuads();
 
-			var glPosition = ((Window)parent).windowToRealPos(InWindowPosition());
+			var glPosition = ObjectToGlPosition(InWindowPosition());
 
 			if (type == Type.Close) {
 				Painter.Sprite(glPosition, size, focus ? Sprites.Name.CloseCircleFocus : Sprites.Name.CloseCircle, layer + 0.5f);
@@ -84,7 +84,8 @@ namespace MarsMiner
 
 				textTexture.Bind();
 				Vector2 TextSize = new Vector2(textTexture.SquareSize.Width, textTexture.SquareSize.Height);
-				Painter.Square(glPosition - new Vector2(- (size.X - textTexture.TextSize.Width) / 2, size.Y + (textTexture.TextSize.Height) / 2.0f ), TextSize, layer + 0.01f);
+				var textPos = glPosition - new Vector2(- (size.X - textTexture.TextSize.Width) / 2, size.Y + (textTexture.TextSize.Height) / 2.0f );
+				Painter.Square(textPos, TextSize, layer + 0.03f);
 			}
 		}		
 
@@ -105,7 +106,7 @@ namespace MarsMiner
 
 		public override void Mouse(Vector2 position, Mouse.Action action)
 		{
-			focus = FocusTest(InObjectPosition(position));
+			focus = FocusTest(ParentToObjectPosition(position));
 			
 			if (focus && action == MarsMiner.Mouse.Action.LeftClick) {
 				if (onClickEvent != null)

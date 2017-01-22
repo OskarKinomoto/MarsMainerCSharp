@@ -17,10 +17,10 @@ namespace MarsMiner
 
 		}
 
-		public static bool GodMode = true;
+		public static bool GodMode = false;
 
 		private static bool mineralsDev = false;
-		private static bool cloudsDev = true;
+		private static bool cloudsDev = false;
 
 
 		public static bool MineralsDeveloper {

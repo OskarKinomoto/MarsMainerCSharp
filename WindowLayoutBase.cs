@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using OpenTK;
 
 namespace MarsMiner
 {
@@ -16,15 +17,16 @@ namespace MarsMiner
 
 		public WindowLayoutBase(WindowObjectBase parent) : base(parent, (parent.getLayer()) + 0.01f, new Point(0,0), Align.Left)
 		{
+			size = parent.Size();
 		}
 
 		abstract public void Add(WindowObjectBase obj);
 
 		abstract public void Add(WindowObjectBase obj, int x, int y);
 
-		public override void Mouse(OpenTK.Vector2 position, MarsMiner.Mouse.Action action)
+		public override void Mouse(Vector2 position, MarsMiner.Mouse.Action action)
 		{
-			base.Mouse(position, action);
+			
 		}
 	}
 }

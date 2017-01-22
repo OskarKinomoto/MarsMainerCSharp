@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Linq;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
+using System.Diagnostics;
 
 namespace MarsMiner
 {
@@ -94,10 +95,19 @@ namespace MarsMiner
             return Text(str, fontName, fontSize, Brushes.Black);
         }
 
+		static bool  IsPowerOfTwo(ulong x)
+		{
+			return (x & (x - 1)) == 0;
+		}
+
         public static Textures Text(String str, FontName fontName, float FontSize, Brush color)
         {
-            const int height = 64; // must be power of 2
-            const int width = 256; // must be power of 2
+            const int height = 64;
+            const int width = 512;
+
+			Debug.Assert(IsPowerOfTwo(height));
+			Debug.Assert(IsPowerOfTwo(width));
+
             Size SquareSize = new Size(width, height);
 
             var font = new Font(fontName.ToString(), FontSize);

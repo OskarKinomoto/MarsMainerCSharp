@@ -47,6 +47,10 @@ namespace MarsMiner
 			EnhancementShop = 45, // – 52
 			TileNonBreakable5 = 53,
 			TileNonBreakable6 = 54,
+			TileNonBreakable7 = 55,
+			TileNonBreakable8 = 56,
+			TileFe = 57,
+			Grass = 58, // – 64
         }
 
         private const int size = 128;

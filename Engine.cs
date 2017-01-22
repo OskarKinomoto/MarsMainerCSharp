@@ -13,7 +13,8 @@ namespace MarsMiner
 	{
 		public enum Model 
 		{
-			Standard
+			Standard,
+			StandardPlus,
 		}
 
 		public class State
@@ -26,6 +27,11 @@ namespace MarsMiner
 				this.running = running;
 				this.angle = angle;
 			}
+		}
+
+		public void Upgrade()
+		{
+			model = Model.StandardPlus;
 		}
 
 		private Model model = Model.Standard;
@@ -42,6 +48,8 @@ namespace MarsMiner
 			case Model.Standard:
 			default:
 				return 180;
+			case Model.StandardPlus:
+				return UpForce(Model.Standard) * 1.5f;
 			}
 		}
 
@@ -58,6 +66,8 @@ namespace MarsMiner
 			case Model.Standard:
 			default:
 				return 100;
+			case Model.StandardPlus:
+				return DownForce(Model.Standard) * 1.5f;
 			}
 		}
 
@@ -74,6 +84,8 @@ namespace MarsMiner
 			case Model.Standard:
 			default:
 				return 200;
+			case Model.StandardPlus:
+				return HorizontalForce(Model.Standard) * 1.5f;
 			}
 		}
 
@@ -87,6 +99,8 @@ namespace MarsMiner
 			case Model.Standard:
 			default:
 				return 1;
+			case Model.StandardPlus:
+				return 1.5f;
 			}
 		}
 

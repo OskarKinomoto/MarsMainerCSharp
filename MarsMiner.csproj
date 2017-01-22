@@ -118,6 +118,7 @@
     <Compile Include="WindowLayoutBase.cs" />
     <Compile Include="WindowOneItemLayout.cs" />
     <Compile Include="Keyboard.cs" />
+    <Compile Include="Grass.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -128,6 +129,9 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="clouds.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="clouds-low.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -156,4 +160,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Folder Include="Buildings\" />
+  </ItemGroup>
 </Project>

@@ -29,6 +29,8 @@ namespace MarsMiner
 
 		private static bool InterfaceOrGame = true;
 
+		private static bool TexturesEnabled = false;
+
 		private static float Scale {
 			get {
 				return InterfaceOrGame ? InterfaceScale : GameScale;
@@ -89,13 +91,6 @@ namespace MarsMiner
 			Sprites.TexCoord(sprite, 3, SpriteOffset);
 			GL.Vertex3(pos.X * Scale, pos.Y * Scale, layer);
 		}
-
-		public static void SpriteArray(Vector2 pos, Vector2 size, int x, int y, Sprites.Name sprite, float layer)
-		{
-			throw new NotImplementedException();
-		}
-
-		private static bool TexturesEnabled = false;
 
 		public static void EnableTextures()
 		{

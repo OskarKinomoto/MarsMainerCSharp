@@ -17,7 +17,7 @@ namespace MarsMiner
 		private const int MapXSize = 40;
 		public const int MinX = -MapXSize / 2;
 		public const int MaxX = MapXSize / 2 - 1;
-		public const int MaxYDepth = 1000;
+		public const int MaxYDepth = 300;
 
 		public const int MinTileX = MinX * Tile.Size;
 		public const int MaxTileX = MaxX * Tile.Size;
@@ -41,16 +41,6 @@ namespace MarsMiner
 			buildings = Buildings.NewBuildings(onClose, money, robot);
 			tiles = new Tiles(buildings);
 			camera.UpdatePosition(robot);
-		}
-
-		public void LoadGame()
-		{
-			// TODO
-		}
-
-		public void SaveGame()
-		{
-			// TODO
 		}
 
 		public Money Money {

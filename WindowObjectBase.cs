@@ -21,8 +21,8 @@ namespace MarsMiner
 
 		// Members
 		protected WindowObjectBase parent;
-		protected Layer layer;
-		protected Point position;
+		public Layer layer;
+		public Point position;
 		protected Align align;
 		protected Vector2 size;
 
@@ -54,9 +54,44 @@ namespace MarsMiner
 			return size.X;
 		}
 
+		virtual public Vector2 Size()
+		{
+			return size;
+		}
+
 		public float Height()
 		{
 			return size.Y;
+		}
+
+		protected Vector2 InWindowPosition() 
+		{
+			const int margin = 5;
+			Vector2 ret = new Vector2(0, position.Y + 5);
+
+			switch (align) {
+			case Align.Right:
+				ret.X = parent.Width() - position.X - size.X - margin;
+				break;
+			case Align.Left:
+				ret.X = position.X + margin;
+				break;
+			case Align.Center:
+				ret.X = (parent.Width() - size.X) / 2;
+				break;
+			}
+
+			return ret;
+		}
+
+		public Vector2 ParentToObjectPosition(Vector2 pos)
+		{
+			return pos - InWindowPosition() + new Vector2(0, 0);
+		}
+
+		virtual public Vector2 ObjectToGlPosition(Vector2 pos)
+		{
+			return parent.ObjectToGlPosition(new Vector2(pos.X + position.X, pos.Y + position.Y));
 		}
 
 		virtual public void Mouse(Vector2 position, Mouse.Action action)

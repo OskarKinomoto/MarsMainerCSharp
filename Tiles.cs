@@ -56,12 +56,15 @@ namespace MarsMiner
 			if (yStart <= -Model.MaxYDepth)
 				yStart = -Model.MaxYDepth - 1;
 
-			// Tiles only betwin MinX – MaxX
+			// Tiles only between MinX – MaxX
 			if (xEnd > Model.MaxX)
 				xEnd = Model.MaxX;
 
 			if (xStart < Model.MinX)
 				xStart = Model.MinX;
+
+			if (yStart - yEnd > 0)
+				return;
 			
 			Painter.EnableTextures();
 			Sprites.Bind();
@@ -70,7 +73,10 @@ namespace MarsMiner
 
 			for (int x = xStart; x < xEnd; ++x)
 				for (int y = yStart; y <= yEnd; ++y)
-					tiles[x - Model.MinX, -y].drawTile();
+					try {
+						tiles[x - Model.MinX, -y].drawTile();
+					} catch (Exception) {
+					}
 			
 			Painter.Stop();
 		}
@@ -78,9 +84,9 @@ namespace MarsMiner
 		private bool CheckTileCords(int xx, int yy)
 		{
 			return xx >= 0 &&
-				yy >= 0 &&
-				xx < tiles.GetLength(0) &&
-				yy < tiles.GetLength(1);
+			yy >= 0 &&
+			xx < tiles.GetLength(0) &&
+			yy < tiles.GetLength(1);
 		}
 
 		private Vector2[] PossibleTilesOnRobot(Vector2 robotPosition)
@@ -90,8 +96,8 @@ namespace MarsMiner
 			var xs = robotPosition.X / Tile.Size;
 			var ys = robotPosition.Y / Tile.Size;
 
-			var yy = (int)Math.Ceiling(ys * -1) - 1;
-			var xx = (int)Math.Floor(xs) - Model.MinX;
+			int yy = (int)Math.Ceiling(ys * -1) - 1;
+			int xx = (int)Math.Floor(xs) - Model.MinX;
 
 			Action<int, int> Add = (x, y) => {
 				retList.Add(new Vector2(x, y));
@@ -111,6 +117,7 @@ namespace MarsMiner
 
 			var PossibleTiles = PossibleTilesOnRobot(r.m_position);
 			var RobotVertices = r.GetVerticies();
+
 			foreach (Vector2 tile in PossibleTiles) {
 				Vector2 tileReal = new Vector2(tile.X + Model.MinX, -tile.Y - 1);
 
@@ -134,7 +141,7 @@ namespace MarsMiner
 			List<CollisionTile> CollisionTilesList = new List<CollisionTile>();
 
 			Action<int, int, CollisionTile.Position> Add = (int xx, int yy, CollisionTile.Position pos) => {
-				if (CheckTileCords(xx, yy) && tiles[xx, yy].collision)
+				if (CheckTileCords(xx, yy) && tiles[xx, yy].collision())
 					CollisionTilesList.Add(new CollisionTile(tiles[xx, yy], pos));
 			};
 
@@ -142,16 +149,9 @@ namespace MarsMiner
 				int xx = (int)tile.X;
 				int yy = (int)tile.Y;
 
-				// right
 				Add(xx + 1, yy, CollisionTile.Position.Right);
-
-				// left
 				Add(xx - 1, yy, CollisionTile.Position.Left);
-
-				// down
 				Add(xx, yy + 1, CollisionTile.Position.Bottom);
-
-				// up
 				Add(xx, yy - 1, CollisionTile.Position.Top);
 			}
 

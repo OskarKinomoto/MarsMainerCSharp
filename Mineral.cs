@@ -26,6 +26,7 @@ namespace MarsMiner
 			Saphire = 6,
 			Salt = 7,
 			Emerald = 8,
+			Fe = 9,
 		}
 			
 		private readonly Sprites.Name sprite;
@@ -97,6 +98,7 @@ namespace MarsMiner
 				ret.Add(Saphire.distribution.Propability(TileDepth));
 				ret.Add(Salt.distribution.Propability(TileDepth));
 				ret.Add(Emerald.distribution.Propability(TileDepth));
+				ret.Add(Fe.distribution.Propability(TileDepth));
 			}
 
 			// Normalize
@@ -140,6 +142,8 @@ namespace MarsMiner
 				return Salt;
 			case 8:
 				return Emerald;
+			case 9:
+				return Fe;
 			}
 
 			throw new Exception();
@@ -187,10 +191,11 @@ namespace MarsMiner
 		public static Mineral Lapis = new Mineral(Type.Lapis, Sprites.Name.TileLapis, 50, new TriangleDistribution(10, 100, 1));
 		public static Mineral Rubin = new Mineral(Type.Rubin, Sprites.Name.TileRubin, 65, new TriangleDistribution(10, 100, 1));
 		public static Mineral Saphire = new Mineral(Type.Saphire, Sprites.Name.TileSaphire, 125, new TriangleDistribution(10, 100, 1));
-		public static Mineral Copper = new Mineral(Type.Copper, Sprites.Name.TileCopper, 5, new TriangleDistribution(10, 100, 1));
+		public static Mineral Copper = new Mineral(Type.Copper, Sprites.Name.TileCopper, 5, new TriangleDistribution(0, 300, 3));
 		public static Mineral Platinium = new Mineral(Type.Platinium, Sprites.Name.TilePlatinium, 250, new TriangleDistribution(10, 100, 1));
 		public static Mineral Salt = new Mineral(Type.Salt, Sprites.Name.TileSalt, 3, new TriangleDistribution(0, 25, 1));
 		public static Mineral Emerald = new Mineral(Type.Emerald, Sprites.Name.TileEmerald, 35, new TriangleDistribution(10, 100, 1));
+		public static Mineral Fe = new Mineral(Type.Fe, Sprites.Name.TileFe, 10, new TriangleDistribution(0, 200, 2));
 	}
 }
 

@@ -72,7 +72,8 @@ namespace MarsMiner
 			for (int i = 0; i < TextureYHeight; ++i)
 				for (int j = 0; j < TextureXWidth; ++j)
 					Painter.Sprite(position + new Vector2(Tile.Size * j, -i * Tile.Size), size, sprite, 3, i * TextureXWidth + j);
-			
+
+			Painter.Stop();			
 		}
 
 		public void PaintBuildingMenu()

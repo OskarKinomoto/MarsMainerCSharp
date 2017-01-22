@@ -5,6 +5,8 @@
  */
 
 using System;
+using OpenTK;
+using System.Drawing;
 
 namespace MarsMiner
 {
@@ -12,8 +14,9 @@ namespace MarsMiner
 	{
 		private WindowObjectBase item;
 
-		public WindowOneItemLayout(WindowObjectBase parent) : base(parent)
+		public WindowOneItemLayout(WindowObjectBase parent, Point position) : base(parent)
 		{
+			this.position = position;
 		}
 
 		public override void Add(WindowObjectBase obj)
@@ -21,6 +24,7 @@ namespace MarsMiner
 			if (item != null)
 				throw new Exception();
 
+			obj.layer = layer;
 			item = obj;
 		}
 
@@ -31,7 +35,18 @@ namespace MarsMiner
 
 		public override void PaintOnScreen()
 		{
+			if (item == null)
+				return;
+			
 			item.PaintOnScreen();
+		}
+
+		public override void Mouse(Vector2 position, MarsMiner.Mouse.Action action)
+		{
+			if (item == null)
+				return;
+
+			item.Mouse(ParentToObjectPosition(position), action);
 		}
 	}
 }

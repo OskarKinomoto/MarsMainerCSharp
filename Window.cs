@@ -13,8 +13,8 @@ namespace MarsMiner
 {
 	class Window : WindowObjectBase
 	{
-		private const int WindowBarWidth = 30;
-		private const int WindowBarMArgin = 2;
+		public const int WindowBarWidth = 30;
+		private const int WindowBarMargin = 2;
 		private bool isOpen = false;
 
 		private string Title = "";
@@ -24,9 +24,9 @@ namespace MarsMiner
 
 		private List<WindowObjectBase> buttons = new List<WindowObjectBase>();
 
-		public void Add(WindowButton button)
+		public void Add(WindowObjectBase obj)
 		{
-			buttons.Add(button);
+			buttons.Add(obj);
 		}
 
 		public Window(int width, int height, string title) : base(null, Layer.Window, new Point(0,0), Align.Center)
@@ -34,7 +34,7 @@ namespace MarsMiner
 			size = new Vector2(width, height);
 			SetTitle(title);
 
-			WindowButton closeBtn = new WindowButton(new System.Drawing.Point(0, 0), WindowButton.Type.Close, this, WindowButton.Align.Right, Layer.StatusText);
+			WindowButton closeBtn = new WindowButton(new Point(0,0), WindowButton.Type.Close, this, WindowButton.Align.Right, Layer.StatusText);
 			closeBtn.onClickEvent += Close;
 			Add(closeBtn);
 		}
@@ -69,22 +69,21 @@ namespace MarsMiner
 			Vector2 size = new Vector2(Width(), Height());
 			Painter.DisableTextures();
 			Painter.Color(.8f, .6f, .8f);
-			Painter.Square(position, size, 10);
+			Painter.Square(position, size, layer);
 
-			Painter.Color(.8f, .5f, .8f);
-			Painter.Square(new Vector2(-Width() / 2, Height() / 2 - WindowBarWidth), new Vector2(Width(), WindowBarWidth), 10.1f);
+			Painter.Color(.8f, 1.0f, .8f);
+			Painter.Square(new Vector2(-Width() / 2, Height() / 2 - WindowBarWidth), new Vector2(Width(), WindowBarWidth), layer + 0.01f);
 
 			Painter.EnableTextures();
 			TitleTex.Bind();
 			Vector2 size2 = new Vector2(TitleTex.SquareSize.Width, TitleTex.SquareSize.Height);
-			Painter.Square(new Vector2(-TitleTex.TextSize.Width / 2, Height() / 2 - 2 * WindowBarWidth - TitleTex.TextSize.Height + 10), size2, 10.11f);
-
+			Painter.Square(new Vector2(-TitleTex.TextSize.Width / 2, Height() / 2 - 2 * WindowBarWidth - TitleTex.TextSize.Height + 10), size2, layer + 0.02f);
 
 			foreach (var btn in buttons)
 				btn.PaintOnScreen();
 		}
 
-		public Vector2 windowToRealPos(Vector2 pos)
+		override public Vector2 ObjectToGlPosition(Vector2 pos)
 		{
 			return new Vector2(pos.X - Width() / 2, -pos.Y + Height() / 2);
 		}
@@ -94,13 +93,18 @@ namespace MarsMiner
 			return new Vector2(pos.X + Width() / 2, -pos.Y + Height() / 2);
 		}
 
-		public void Mouse(Vector2 position, Mouse.Action action)
+		override public void Mouse(Vector2 position, Mouse.Action action)
 		{
 			if (position.X < 0 || position.Y < 0 || position.X > Width() || position.Y > Height())
 				return;
 
 			foreach (var btn in buttons)
 				btn.Mouse(position, action);
+		}
+
+		public override Vector2 Size()
+		{
+			return base.Size() - new Vector2(0, WindowBarWidth);
 		}
 	}
 }

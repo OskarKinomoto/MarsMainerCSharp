@@ -10,7 +10,7 @@ namespace MarsMiner
 {
 	public class Money : PaintInterface
 	{
-		private int money = 100;
+		private int money = 1000;
 		private Textures Texture;
 
 		public int Count() {

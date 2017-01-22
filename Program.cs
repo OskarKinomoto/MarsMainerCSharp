@@ -21,8 +21,6 @@ namespace MarsMiner
 		public View() : base(1280, 720, GraphicsMode.Default, "Miner")
         {
 			VSync = VSyncMode.Adaptive;
-			// TODO optimize?
-			//c.mouseVisible += (bool visible) => {if (this.CursorVisible != visible) this.CursorVisible = visible;};
         }
 
         protected override void OnLoad(EventArgs e)

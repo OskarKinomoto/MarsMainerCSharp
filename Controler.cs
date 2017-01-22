@@ -32,9 +32,6 @@ namespace MarsMiner
 
 		Building activeBuilding = null;
 
-		private const float LAYER_BG = -10;
-		private const float LAYER_TEXT = 10;
-
 		public Keyboard keys = new Keyboard();
 
 		public Mouse mouse = new Mouse();
@@ -44,6 +41,7 @@ namespace MarsMiner
 		public static float WindowHeight = 0;
 
 		private Clouds clouds = new Clouds();
+		private Grass grass = new Grass();
 
 		private State state = State.MainMenu;
 
@@ -159,6 +157,7 @@ namespace MarsMiner
 				RenderTiles();
 
 				clouds.Paint();
+				grass.Paint();
 
 				if (m.robot.m_position.Y < height && m.robot.m_position.Y > -height)
 					foreach (Building b in m.GetBuildings)
