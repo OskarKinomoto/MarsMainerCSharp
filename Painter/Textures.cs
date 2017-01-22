@@ -161,7 +161,7 @@ namespace MarsMiner
 
         public Textures(String path)
         {
-            Bitmap tmpBitmap = new Bitmap(path);
+            Bitmap tmpBitmap = new Bitmap("img/" + path);
             _SquareSize = tmpBitmap.Size;
             _tex = Load(tmpBitmap);
         }
